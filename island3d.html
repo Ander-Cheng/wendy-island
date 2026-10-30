@@ -16,7 +16,6 @@
   #app{position:fixed;inset:0}
   canvas{display:block}
 
-  /* ---- loading ---- */
   #loader{
     position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
     align-items:center;justify-content:center;gap:16px;
@@ -28,33 +27,21 @@
     border-radius:50%;animation:sp 1s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
 
-  /* ---- title overlay ---- */
-  #title{
-    position:fixed;top:26px;left:0;width:100%;text-align:center;z-index:10;
-    pointer-events:none;
-  }
-  #title h1{
-    font-size:clamp(2rem,7vw,3.6rem);color:#fff;letter-spacing:2px;
-    text-shadow:0 3px 0 var(--coral),0 8px 20px rgba(42,111,151,.4);
-  }
-  #title p{
-    margin-top:8px;font-size:clamp(.9rem,3vw,1.15rem);color:var(--sea-deep);
-    display:inline-block;background:rgba(255,255,255,.7);padding:6px 18px;border-radius:999px;
-  }
+  #title{position:fixed;top:22px;left:0;width:100%;text-align:center;z-index:10;pointer-events:none}
+  #title h1{font-size:clamp(2rem,7vw,3.4rem);color:#fff;letter-spacing:2px;text-shadow:0 3px 0 var(--coral),0 8px 20px rgba(42,111,151,.4)}
+  #title p{margin-top:8px;font-size:clamp(.85rem,3vw,1.1rem);color:var(--sea-deep);display:inline-block;background:rgba(255,255,255,.7);padding:6px 18px;border-radius:999px}
   #title p b{color:var(--coral)}
 
-  /* ---- hint ---- */
   #hint{
     position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;
-    background:rgba(255,255,255,.8);color:var(--sea-deep);padding:9px 20px;border-radius:999px;
-    font-size:.9rem;box-shadow:0 6px 18px rgba(42,111,151,.25);white-space:nowrap;
+    background:rgba(255,255,255,.82);color:var(--sea-deep);padding:9px 20px;border-radius:999px;
+    font-size:.9rem;box-shadow:0 6px 18px rgba(42,111,151,.25);text-align:center;max-width:92vw;
     transition:opacity .5s;
   }
 
-  /* ---- info card ---- */
   #card{
     position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%) scale(.85);
-    width:min(420px,88vw);max-height:80vh;overflow:auto;background:var(--cream);
+    width:min(440px,90vw);max-height:82vh;overflow:auto;background:var(--cream);
     border-radius:24px;padding:28px 26px 26px;box-shadow:0 24px 60px rgba(42,111,151,.4);
     border:4px solid #fff;opacity:0;pointer-events:none;transition:all .3s;
   }
@@ -70,22 +57,17 @@
   #card .body .row .v b{color:var(--coral)}
   #card .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   #card .chip{background:#fff0f5;color:var(--coral);padding:8px 14px;border-radius:999px;font-weight:700;font-size:.95rem}
+  #card .group-title{font-weight:800;color:var(--sea-deep);margin:14px 0 6px;font-size:1.05rem}
 
-  /* propose card special styling */
+  /* propose card */
   #card.propose{border-color:#ff8fab;box-shadow:0 24px 70px rgba(255,93,143,.5);background:linear-gradient(180deg,#fffaf3,#fff0f5)}
   #card.propose h2{font-size:1.8rem;background:linear-gradient(90deg,#ff5d8f,#ff8fab);-webkit-background-clip:text;background-clip:text;color:transparent;animation:beat 1.6s infinite}
   @keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.06)}}
-  #yesBtn{
-    font-size:1.25rem;font-weight:800;color:#fff;cursor:pointer;border:none;
-    padding:14px 42px;border-radius:999px;
-    background:linear-gradient(90deg,#ff5d8f,#ff8fab);
-    box-shadow:0 10px 24px rgba(255,93,143,.5);
-    transition:transform .2s;animation:beat 1.4s infinite;
-  }
+  #yesBtn{font-size:1.25rem;font-weight:800;color:#fff;cursor:pointer;border:none;padding:14px 42px;border-radius:999px;
+    background:linear-gradient(90deg,#ff5d8f,#ff8fab);box-shadow:0 10px 24px rgba(255,93,143,.5);transition:transform .2s;animation:beat 1.4s infinite}
   #yesBtn:hover{transform:scale(1.08)}
   #yesBtn:active{transform:scale(.96)}
 
-  /* ---- 2d link ---- */
   #back2d{
     position:fixed;top:18px;right:18px;z-index:10;background:rgba(255,255,255,.85);
     color:var(--sea-deep);text-decoration:none;padding:8px 16px;border-radius:999px;
@@ -109,7 +91,7 @@
 
   <a id="back2d" href="index.html">← 2D 版</a>
 
-  <div id="hint">🖱️ 拖曳旋轉 ・ 滾輪縮放 ・ 點中央的 Wendy 👑 與周邊小島探索</div>
+  <div id="hint">🖱️ 拖曳旋轉 ・ 滾輪縮放 ・ 點中央的「我」💍 向 Wendy 求婚 ・ 親友島上有家人們，滑過看名字</div>
 
   <div id="card">
     <button class="close" aria-label="close">×</button>
@@ -134,13 +116,13 @@
   const loaderEl = document.getElementById('loader');
   const hintEl = document.getElementById('hint');
 
-  // ---------- scene ----------
+  // ========================= scene =========================
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xbfe9f5);
-  scene.fog = new THREE.Fog(0xbfe9f5, 55, 130);
+  scene.fog = new THREE.Fog(0xbfe9f5, 60, 150);
 
-  const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 300);
-  camera.position.set(22, 20, 26);
+  const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 400);
+  camera.position.set(24, 22, 30);
 
   const renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(innerWidth, innerHeight);
@@ -149,283 +131,82 @@
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   document.getElementById('app').appendChild(renderer.domElement);
 
-  // shared interaction state (declared early to avoid TDZ)
   let fly = null;
   let proposeActive = false;
+  let ringGiven = false;
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.minDistance = 6;
-  controls.maxDistance = 70;
+  controls.maxDistance = 80;
   controls.maxPolarAngle = Math.PI/2.15;
   controls.target.set(0, 1.5, 0);
   controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.6;
+  controls.autoRotateSpeed = 0.5;
 
-  // ---------- lights ----------
+  // ========================= lights =========================
   scene.add(new THREE.HemisphereLight(0xffffff, 0x88bbdd, 0.9));
   const sun = new THREE.DirectionalLight(0xffffff, 1.1);
-  sun.position.set(12, 20, 10);
+  sun.position.set(18, 28, 16);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.left = -40; sun.shadow.camera.right = 40;
-  sun.shadow.camera.top = 40; sun.shadow.camera.bottom = -40;
-  sun.shadow.camera.far = 80;
+  sun.shadow.camera.left = -45; sun.shadow.camera.right = 45;
+  sun.shadow.camera.top = 45; sun.shadow.camera.bottom = -45;
+  sun.shadow.camera.far = 90;
   scene.add(sun);
 
-  // ---------- helpers ----------
   const flat = (c) => new THREE.MeshStandardMaterial({ color:c, flatShading:true, roughness:.9, metalness:0 });
 
-  // ---------- sea ----------
-  const seaGeo = new THREE.PlaneGeometry(200, 200, 80, 80);
+  // ========================= sea =========================
+  const seaGeo = new THREE.PlaneGeometry(240, 240, 90, 90);
   const seaMat = new THREE.MeshStandardMaterial({ color:0x4ba3c7, flatShading:true, roughness:.6, transparent:true, opacity:.95 });
   const sea = new THREE.Mesh(seaGeo, seaMat);
-  sea.rotation.x = -Math.PI/2;
-  sea.position.y = -0.4;
-  sea.receiveShadow = true;
+  sea.rotation.x = -Math.PI/2; sea.position.y = -0.4; sea.receiveShadow = true;
   scene.add(sea);
   const seaBase = seaGeo.attributes.position.array.slice();
 
-  // ---------- island ----------
+  // ========================= main island =========================
   const island = new THREE.Group();
   scene.add(island);
 
-  // sand (cone-ish cylinder)
   const sand = new THREE.Mesh(new THREE.CylinderGeometry(9, 11, 2.2, 10), flat(0xffe0b3));
-  sand.position.y = 0.1; sand.castShadow = sand.receiveShadow = true;
-  island.add(sand);
-
-  // dirt underside
+  sand.position.y = 0.1; sand.castShadow = sand.receiveShadow = true; island.add(sand);
   const dirt = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 2, 5, 9), flat(0xb5835a));
   dirt.position.y = -3; island.add(dirt);
-
-  // grass top
   const grass = new THREE.Mesh(new THREE.CylinderGeometry(7.6, 9, 1.2, 10), flat(0x8cd17d));
-  grass.position.y = 1.3; grass.castShadow = grass.receiveShadow = true;
-  island.add(grass);
-
-  // little hill
+  grass.position.y = 1.3; grass.castShadow = grass.receiveShadow = true; island.add(grass);
   const hill = new THREE.Mesh(new THREE.ConeGeometry(3.2, 3.2, 8), flat(0x72c267));
-  hill.position.set(-3.2, 2.6, -2.6); hill.castShadow = true;
-  island.add(hill);
+  hill.position.set(-3.2, 2.6, -2.6); hill.castShadow = true; island.add(hill);
 
-  // ---------- trees ----------
-  function palm(x, z, s=1){
+  function palm(x, z, s=1, parent=island){
     const g = new THREE.Group();
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.18, .3, 3*s, 6), flat(0xb07a43));
     trunk.position.y = 1.5*s; trunk.castShadow = true; g.add(trunk);
     for(let i=0;i<5;i++){
       const leaf = new THREE.Mesh(new THREE.ConeGeometry(.35*s, 2.2*s, 5), flat(0x5fb85a));
-      leaf.position.y = 3*s; leaf.rotation.z = Math.PI/2.6;
-      leaf.rotation.y = i*(Math.PI*2/5);
-      leaf.position.x = Math.cos(i*(Math.PI*2/5))*1.1*s;
-      leaf.position.z = Math.sin(i*(Math.PI*2/5))*1.1*s;
+      leaf.position.y = 3*s; leaf.rotation.z = Math.PI/2.6; leaf.rotation.y = i*(Math.PI*2/5);
+      leaf.position.x = Math.cos(i*(Math.PI*2/5))*1.1*s; leaf.position.z = Math.sin(i*(Math.PI*2/5))*1.1*s;
       leaf.castShadow = true; g.add(leaf);
     }
-    g.position.set(x, 1.8, z); g.scale.setScalar(s);
-    island.add(g);
+    g.position.set(x, 1.8, z); g.scale.setScalar(s); parent.add(g);
   }
-  palm(4.5, -3.5, 1.1);
-  palm(-5.5, 1.5, 0.9);
-  palm(2, 4.8, 1);
+  palm(5.5, -4.5, 1.1); palm(-6, 2, 0.9); palm(2, 5.5, 1);
 
-  // decorative rocks + flag
   const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(.9, 0), flat(0xa9b4bc));
-  rock.position.set(5, 1.8, 3); rock.castShadow = true; island.add(rock);
+  rock.position.set(6, 1.8, 3.5); rock.castShadow = true; island.add(rock);
 
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,4,6), flat(0xdddddd));
-  pole.position.set(-3.2, 5.6, -2.6); island.add(pole);
-  const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.6,1), new THREE.MeshStandardMaterial({color:0xff5d8f,flatShading:true,side:THREE.DoubleSide}));
-  flag.position.set(-2.45, 6.6, -2.6); island.add(flag);
-
-  // ---------- clouds ----------
+  // ========================= clouds =========================
   const clouds = [];
   function cloud(x,y,z){
-    const g = new THREE.Group();
-    const m = flat(0xffffff);
+    const g = new THREE.Group(); const m = flat(0xffffff);
     [[0,0,0,1.4],[1.2,-.2,0,1],[-1.2,-.1,.2,.9],[.3,.6,-.3,.8]].forEach(p=>{
       const s = new THREE.Mesh(new THREE.IcosahedronGeometry(p[3],0), m);
       s.position.set(p[0],p[1],p[2]); g.add(s);
     });
-    g.position.set(x,y,z); g.scale.setScalar(1.3);
-    scene.add(g); clouds.push(g);
+    g.position.set(x,y,z); g.scale.setScalar(1.3); scene.add(g); clouds.push(g);
   }
-  cloud(-18,12,-10); cloud(18,14,4); cloud(3,16,-20); cloud(-6,13,18); cloud(22,11,-14);
-
-  // ---------- interactive blocks ----------
-  const DATA = {
-    personality: {
-      ic:'✨', title:'她是怎樣的人',
-      html:`
-        <div class="row"><div class="k">🎀</div><div class="v"><b>可愛</b><br>一舉一動都讓人融化，笑起來能照亮整座島。</div></div>
-        <div class="row"><div class="k">🤲</div><div class="v"><b>貼心</b><br>總是先想到別人，默默把溫暖準備好。</div></div>
-        <div class="row"><div class="k">💪</div><div class="v"><b>勤奮</b><br>認真又努力，設定目標就穩穩前進，超可靠。</div></div>`
-    },
-    zoo: {
-      ic:'🐾', title:'可愛動物園',
-      html:`<div class="chips">
-        <span class="chip">🐱 貓</span><span class="chip">🐶 狗</span>
-        <span class="chip">🐢 烏龜</span><span class="chip">🐴 小馬</span>
-        <span class="chip">🐑 羊</span><span class="chip">🦎 變色龍</span>
-      </div><p style="text-align:center;margin-top:14px;color:#7a95a3">寶寶最愛的毛茸茸朋友們 💕</p>`
-    },
-    trips: {
-      ic:'✈️', title:'一起走過的旅行足跡',
-      html:`
-        <div class="row"><div class="k">🇻🇳</div><div class="v"><b>富國島</b>　陽光、海灘與椰林</div></div>
-        <div class="row"><div class="k">🗼</div><div class="v"><b>東京</b>　繁華又浪漫的日本</div></div>
-        <div class="row"><div class="k">🌺</div><div class="v"><b>沖繩</b>　碧海藍天的度假島</div></div>
-        <div class="row"><div class="k">🇰🇷</div><div class="v"><b>釜山</b>　海港城市的悠閒</div></div>
-        <div class="row"><div class="k">🏔️</div><div class="v"><b>湯澤</b>　雪國溫泉的浪漫</div></div>`
-    },
-    journey: {
-      ic:'🗺️', title:'她的人生航線',
-      html:`
-        <div class="row"><div class="k">👶</div><div class="v"><b>1994</b>　寶寶降臨世界，故事的起點。</div></div>
-        <div class="row"><div class="k">🎓</div><div class="v"><b>2016</b>　文化大學畢業，帶著夢想出發。</div></div>
-        <div class="row"><div class="k">🛋️</div><div class="v"><b>2019</b>　在 Crate &amp; Barrel 相遇。</div></div>
-        <div class="row"><div class="k">💑</div><div class="v"><b>2023</b>　正式在一起，島上有了我們。</div></div>`
-    },
-    propose: {
-      ic:'💍', title:'Will you marry me?',
-      html:`
-        <p style="text-align:center;color:#6b7b86;line-height:1.9;margin-bottom:6px">
-          親愛的寶寶，謝謝妳走進我的世界，成為這座島的名字。<br>
-          從 Crate &amp; Barrel 的相遇，到現在的每一天，<br>
-          我想把剩下的人生，都留在這座島上陪妳。
-        </p>
-        <div id="propose-actions" style="text-align:center;margin-top:18px">
-          <button id="yesBtn">Yes, I do 💍</button>
-        </div>
-        <p id="propose-answer" style="display:none;text-align:center;margin-top:16px;font-size:1.3rem;color:#ff5d8f;font-weight:800;line-height:1.7">
-          💖 她答應了！<br>從今天起，Wendy 島永遠有我們兩個人 💑
-        </p>`
-    }
-  };
-
-  // ======================================================
-  //  INTERACTIVE LANDMARK MODELS (low-poly, specific shapes)
-  // ======================================================
-  const blocks = [];
-
-  function textLabel(label, y){
-    const lc = document.createElement('canvas'); lc.width=256; lc.height=64;
-    const lx = lc.getContext('2d');
-    lx.fillStyle='#2a6f97'; lx.font='bold 34px "Microsoft JhengHei",sans-serif';
-    lx.textAlign='center'; lx.textBaseline='middle'; lx.fillText(label,128,36);
-    const ltex = new THREE.CanvasTexture(lc);
-    const lspr = new THREE.Sprite(new THREE.SpriteMaterial({ map:ltex, transparent:true, depthTest:false }));
-    lspr.scale.set(3,0.75,1); lspr.position.y = y;
-    return lspr;
-  }
-
-  // --- build a small floating satellite island at world (wx,wz) ---
-  const satellites = [];           // small islands {group, bobPhase}
-  function buildSatelliteIsland(wx, wz, tint){
-    const g = new THREE.Group();
-    const sand = new THREE.Mesh(new THREE.CylinderGeometry(3.4,4.2,1.4,9), flat(0xffe0b3));
-    sand.position.y = 0; sand.castShadow = sand.receiveShadow = true; g.add(sand);
-    const dirt = new THREE.Mesh(new THREE.CylinderGeometry(2.8,0.8,3,8), flat(0xb5835a));
-    dirt.position.y = -2.1; g.add(dirt);
-    const grass = new THREE.Mesh(new THREE.CylinderGeometry(2.9,3.5,0.8,9), flat(tint||0x8cd17d));
-    grass.position.y = 0.9; grass.castShadow = grass.receiveShadow = true; g.add(grass);
-    // a tiny palm for charm
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.12,.2,1.8,6), flat(0xb07a43));
-    trunk.position.set(1.8,1.8,1.4); g.add(trunk);
-    for(let i=0;i<4;i++){
-      const leaf = new THREE.Mesh(new THREE.ConeGeometry(.25,1.3,5), flat(0x5fb85a));
-      leaf.position.set(1.8,2.7,1.4); leaf.rotation.z=Math.PI/2.6; leaf.rotation.y=i*(Math.PI/2);
-      leaf.position.x += Math.cos(i*Math.PI/2)*0.7; leaf.position.z += Math.sin(i*Math.PI/2)*0.7;
-      g.add(leaf);
-    }
-    g.position.set(wx, 0.6, wz);
-    scene.add(g);
-    satellites.push({ group:g, phase:Math.random()*Math.PI*2 });
-    return g;
-  }
-
-  // registers a landmark on its OWN satellite island
-  function registerBlock(key, group, wx, wz, label, labelY, hitSize, tint){
-    const isle = buildSatelliteIsland(wx, wz, tint);
-    const hit = new THREE.Mesh(new THREE.BoxGeometry(hitSize,hitSize,hitSize),
-                 new THREE.MeshBasicMaterial({visible:false}));
-    hit.position.y = hitSize/2;
-    group.add(hit);
-    group.add(textLabel(label, labelY));
-    group.position.set(0, 1.3, 0);          // sit on top of the satellite
-    isle.add(group);
-    group.userData = { key, baseY:1.3, phase:Math.random()*Math.PI*2, cube:hit, focus:new THREE.Vector3(wx,2,wz) };
-    blocks.push(group);
-  }
-
-  // --- 個性：愛心 ---
-  function buildHeart(){
-    const g = new THREE.Group();
-    const shape = new THREE.Shape();
-    shape.moveTo(0,0.5);
-    shape.bezierCurveTo(0,0.9, -0.5,1.2, -0.9,0.7);
-    shape.bezierCurveTo(-1.4,0.1, -0.5,-0.5, 0,-1);
-    shape.bezierCurveTo(0.5,-0.5, 1.4,0.1, 0.9,0.7);
-    shape.bezierCurveTo(0.5,1.2, 0,0.9, 0,0.5);
-    const geo = new THREE.ExtrudeGeometry(shape,{depth:0.5,bevelEnabled:true,bevelThickness:0.12,bevelSize:0.12,bevelSegments:1,steps:1});
-    geo.center();
-    const heart = new THREE.Mesh(geo, flat(0xff5d8f));
-    heart.scale.setScalar(1.1); heart.position.y = 1.2; heart.castShadow = true;
-    g.add(heart);
-    return g;
-  }
-
-  // --- 動物園：柵欄 + 招牌 ---
-  function buildZoo(){
-    const g = new THREE.Group();
-    const postMat = flat(0xcf9b6a), railMat = flat(0xe8c39e);
-    for(let i=-1;i<=1;i++){
-      const p = new THREE.Mesh(new THREE.BoxGeometry(0.22,1.1,0.22), postMat);
-      p.position.set(i*0.9,0.55,0); p.castShadow=true; g.add(p);
-    }
-    const rail = new THREE.Mesh(new THREE.BoxGeometry(2.1,0.2,0.15), railMat);
-    rail.position.set(0,0.75,0); g.add(rail);
-    const rail2 = rail.clone(); rail2.position.y=0.45; g.add(rail2);
-    // sign board
-    const board = new THREE.Mesh(new THREE.BoxGeometry(1.5,0.8,0.12), flat(0xffd166));
-    board.position.set(0,1.7,0); board.castShadow=true; g.add(board);
-    const paw = new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('🐾'),transparent:true}));
-    paw.scale.set(0.7,0.7,1); paw.position.set(0,1.7,0.1); g.add(paw);
-    return g;
-  }
-
-  // --- 旅行：小飛機 ---
-  function buildPlane(){
-    const g = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.6,4,8), flat(0xffffff));
-    body.rotation.z = Math.PI/2; body.position.y=1.2; body.castShadow=true; g.add(body);
-    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.4,0.6,8), flat(0xff5d8f));
-    nose.rotation.z=-Math.PI/2; nose.position.set(1.3,1.2,0); g.add(nose);
-    const wing = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.1,2.6), flat(0x90e0ef));
-    wing.position.y=1.2; wing.castShadow=true; g.add(wing);
-    const tailW = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,1), flat(0x90e0ef));
-    tailW.position.set(-1.1,1.25,0); g.add(tailW);
-    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.6,0.1), flat(0xff5d8f));
-    fin.position.set(-1.1,1.55,0); g.add(fin);
-    return g;
-  }
-
-  // --- 人生：里程碑路標 ---
-  function buildMilestone(){
-    const g = new THREE.Group();
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,2.2,8), flat(0xb5835a));
-    post.position.y=1.1; post.castShadow=true; g.add(post);
-    const cols = [0xff5d8f,0xffd166,0x90e0ef];
-    cols.forEach((c,i)=>{
-      const s = new THREE.Mesh(new THREE.BoxGeometry(1.4,0.4,0.14), flat(c));
-      s.position.set(i%2?0.3:-0.3, 1.9-i*0.5, 0);
-      s.rotation.y = i%2?0.2:-0.2; s.castShadow=true; g.add(s);
-    });
-    const star = new THREE.Mesh(new THREE.DodecahedronGeometry(0.35,0), flat(0xffe066));
-    star.position.y=2.4; star.castShadow=true; g.add(star);
-    return g;
-  }
+  cloud(-20,13,-12); cloud(20,15,5); cloud(4,17,-22); cloud(-8,14,20); cloud(24,12,-16);
 
   // emoji -> texture helper
   function emojiTex(e,size=128){
@@ -434,44 +215,19 @@
     c.textAlign='center'; c.textBaseline='middle'; c.fillText(e,size/2,size*0.56);
     return new THREE.CanvasTexture(cv);
   }
-
-  // satellite islands around the main island (N / E / S / W)
-  registerBlock('personality', buildHeart(),      0,  -15, '個性島',   3.2, 2.8, 0xffc2d1);
-  registerBlock('zoo',         buildZoo(),        15,   0,  '動物島',   3.0, 2.4, 0xffe08a);
-  registerBlock('trips',       buildPlane(),       0,   15, '旅行島',   2.6, 2.2, 0xa9e6f0);
-  registerBlock('journey',     buildMilestone(), -15,   0,  '人生島',   3.1, 2.6, 0xc4f0d8);
-
-  // ======================================================
-  //  ISLAND RESIDENTS (cute low-poly critters that wander)
-  // ======================================================
-  const residents = [];
-  function critter(build, x, z, say){
-    const g = build();
-    g.position.set(x, 1.95, z);
-    g.rotation.y = Math.random()*Math.PI*2;
-    // speech bubble sprite (hidden until hover)
-    const bubble = new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex(say),transparent:true,depthTest:false}));
-    bubble.scale.set(2.4,1.2,1); bubble.position.y=1.8; bubble.visible=false;
-    g.add(bubble);
-    const hit = new THREE.Mesh(new THREE.BoxGeometry(1.4,1.4,1.4), new THREE.MeshBasicMaterial({visible:false}));
-    hit.position.y=0.5; g.add(hit);
-    g.userData = {
-      bubble, hit,
-      baseY:1.95,
-      phase:Math.random()*Math.PI*2,
-      angle:Math.random()*Math.PI*2,
-      speed:0.15+Math.random()*0.15,
-      radius:1.5+Math.random()*3.5,
-      cx:x, cz:z, turn:(Math.random()-0.5)*0.01
-    };
-    island.add(g);
-    residents.push(g);
+  function textLabel(label, y){
+    const lc = document.createElement('canvas'); lc.width=256; lc.height=64;
+    const lx = lc.getContext('2d');
+    lx.fillStyle='#2a6f97'; lx.font='bold 34px "Microsoft JhengHei",sans-serif';
+    lx.textAlign='center'; lx.textBaseline='middle'; lx.fillText(label,128,36);
+    const ltex = new THREE.CanvasTexture(lc);
+    const lspr = new THREE.Sprite(new THREE.SpriteMaterial({ map:ltex, transparent:true, depthTest:false }));
+    lspr.scale.set(3.4,0.85,1); lspr.position.y = y; return lspr;
   }
   function bubbleTex(text){
     const cv=document.createElement('canvas'); cv.width=256; cv.height=128;
     const c=cv.getContext('2d');
-    c.fillStyle='rgba(255,255,255,.95)';
-    roundRect(c,8,8,240,86,22); c.fill();
+    c.fillStyle='rgba(255,255,255,.95)'; roundRect(c,8,8,240,86,22); c.fill();
     c.beginPath(); c.moveTo(118,92); c.lineTo(138,92); c.lineTo(128,118); c.closePath(); c.fill();
     c.fillStyle='#ff5d8f'; c.font='bold 30px "Microsoft JhengHei",sans-serif';
     c.textAlign='center'; c.textBaseline='middle'; c.fillText(text,128,50);
@@ -479,91 +235,230 @@
   }
   function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
 
-  // --- critter builders ---
-  function body4leg(bodyColor, w,h,d){
-    const g=new THREE.Group();
-    const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),flat(bodyColor));
-    b.position.y=0.55; b.castShadow=true; g.add(b);
-    const legGeo=new THREE.BoxGeometry(0.16,0.4,0.16), legMat=flat(bodyColor);
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
-      const l=new THREE.Mesh(legGeo,legMat);
-      l.position.set(p[0]*w/2.6,0.2,p[1]*d/2.6); g.add(l);
+  // ========================= landmark models =========================
+  function buildHeart(){
+    const g = new THREE.Group();
+    const shape = new THREE.Shape();
+    shape.moveTo(0,0.5);
+    shape.bezierCurveTo(0,0.9,-0.5,1.2,-0.9,0.7);
+    shape.bezierCurveTo(-1.4,0.1,-0.5,-0.5,0,-1);
+    shape.bezierCurveTo(0.5,-0.5,1.4,0.1,0.9,0.7);
+    shape.bezierCurveTo(0.5,1.2,0,0.9,0,0.5);
+    const geo = new THREE.ExtrudeGeometry(shape,{depth:0.5,bevelEnabled:true,bevelThickness:0.12,bevelSize:0.12,bevelSegments:1,steps:1});
+    geo.center();
+    const heart = new THREE.Mesh(geo, flat(0xff5d8f));
+    heart.scale.setScalar(1.1); heart.position.y = 1.2; heart.castShadow = true; g.add(heart);
+    return g;
+  }
+  function buildZoo(){
+    const g = new THREE.Group();
+    const postMat = flat(0xcf9b6a), railMat = flat(0xe8c39e);
+    for(let i=-1;i<=1;i++){ const p=new THREE.Mesh(new THREE.BoxGeometry(0.22,1.1,0.22),postMat); p.position.set(i*0.9,0.55,0); p.castShadow=true; g.add(p); }
+    const rail=new THREE.Mesh(new THREE.BoxGeometry(2.1,0.2,0.15),railMat); rail.position.set(0,0.75,0); g.add(rail);
+    const rail2=rail.clone(); rail2.position.y=0.45; g.add(rail2);
+    const board=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.8,0.12),flat(0xffd166)); board.position.set(0,1.7,0); board.castShadow=true; g.add(board);
+    const paw=new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('🐾'),transparent:true})); paw.scale.set(0.7,0.7,1); paw.position.set(0,1.7,0.1); g.add(paw);
+    return g;
+  }
+  function buildPlane(){
+    const g = new THREE.Group();
+    const body=new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.6,4,8),flat(0xffffff)); body.rotation.z=Math.PI/2; body.position.y=1.2; body.castShadow=true; g.add(body);
+    const nose=new THREE.Mesh(new THREE.ConeGeometry(0.4,0.6,8),flat(0xff5d8f)); nose.rotation.z=-Math.PI/2; nose.position.set(1.3,1.2,0); g.add(nose);
+    const wing=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.1,2.6),flat(0x90e0ef)); wing.position.y=1.2; wing.castShadow=true; g.add(wing);
+    const tailW=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,1),flat(0x90e0ef)); tailW.position.set(-1.1,1.25,0); g.add(tailW);
+    const fin=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.6,0.1),flat(0xff5d8f)); fin.position.set(-1.1,1.55,0); g.add(fin);
+    return g;
+  }
+  function buildMilestone(){
+    const g = new THREE.Group();
+    const post=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,2.2,8),flat(0xb5835a)); post.position.y=1.1; post.castShadow=true; g.add(post);
+    [0xff5d8f,0xffd166,0x90e0ef].forEach((c,i)=>{ const s=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.4,0.14),flat(c)); s.position.set(i%2?0.3:-0.3,1.9-i*0.5,0); s.rotation.y=i%2?0.2:-0.2; s.castShadow=true; g.add(s); });
+    const star=new THREE.Mesh(new THREE.DodecahedronGeometry(0.35,0),flat(0xffe066)); star.position.y=2.4; star.castShadow=true; g.add(star);
+    return g;
+  }
+  function buildFamilyHouse(){
+    const g = new THREE.Group();
+    const base=new THREE.Mesh(new THREE.BoxGeometry(1.8,1.3,1.6),flat(0xfff1e6)); base.position.y=0.65; base.castShadow=true; g.add(base);
+    const roof=new THREE.Mesh(new THREE.ConeGeometry(1.5,1,4),flat(0xff8fab)); roof.position.y=1.8; roof.rotation.y=Math.PI/4; roof.castShadow=true; g.add(roof);
+    const door=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.8,0.1),flat(0xb5835a)); door.position.set(0,0.4,0.82); g.add(door);
+    const heart=new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('👨‍👩‍👧‍👦'),transparent:true})); heart.scale.set(0.9,0.9,1); heart.position.set(0,2.6,0); g.add(heart);
+    return g;
+  }
+
+  // ========================= satellite islands + bridges =========================
+  const satellites = [];
+  const blocks = [];
+
+  function buildSatelliteIsland(wx, wz, tint, r=3.9){
+    const g = new THREE.Group();
+    const sand = new THREE.Mesh(new THREE.CylinderGeometry(r*0.85, r, 1.4, 9), flat(0xffe0b3));
+    sand.position.y = 0; sand.castShadow = sand.receiveShadow = true; g.add(sand);
+    const dirt = new THREE.Mesh(new THREE.CylinderGeometry(r*0.7, 0.8, 3, 8), flat(0xb5835a));
+    dirt.position.y = -2.1; g.add(dirt);
+    const grass = new THREE.Mesh(new THREE.CylinderGeometry(r*0.72, r*0.88, 0.8, 9), flat(tint||0x8cd17d));
+    grass.position.y = 0.9; grass.castShadow = grass.receiveShadow = true; g.add(grass);
+    palm(r*0.5, r*0.4, 0.7, g);
+    g.position.set(wx, 0.6, wz); scene.add(g);
+    satellites.push({ group:g, phase:Math.random()*Math.PI*2, baseY:0.6 });
+    return g;
+  }
+
+  // wooden bridge from main island edge toward a satellite
+  function buildBridge(wx, wz, satR=3.4){
+    const g = new THREE.Group();
+    const dir = new THREE.Vector2(wx, wz).normalize();
+    const start = 8.5;                                // main island edge
+    const end = Math.hypot(wx,wz) - satR;             // satellite edge
+    const len = end - start;
+    const planks = Math.max(4, Math.floor(len/0.8));
+    const angle = Math.atan2(wz, wx);
+    for(let i=0;i<planks;i++){
+      const d = start + (i+0.5)*(len/planks);
+      const plank = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.14,1.2), flat(i%2?0xc99a66:0xb5835a));
+      plank.position.set(dir.x*d, 1.55 + Math.sin(i*0.6)*0.05, dir.y*d);
+      plank.rotation.y = -angle;
+      plank.castShadow = true; g.add(plank);
+    }
+    // rope rails
+    [-0.55,0.55].forEach(off=>{
+      const rope = new THREE.Mesh(new THREE.BoxGeometry(len,0.05,0.05), flat(0xe8c39e));
+      rope.position.set(dir.x*(start+len/2), 1.95, dir.y*(start+len/2));
+      rope.rotation.y = -angle;
+      rope.translateZ(off); g.add(rope);
     });
-    g.userData={body:b};
-    return g;
+    scene.add(g);
   }
-  function buildCat(){
-    const g=body4leg(0xf4a259,0.9,0.55,1.3);
-    const head=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.55,0.55),flat(0xf4a259));
-    head.position.set(0,0.75,0.65); head.castShadow=true; g.add(head);
-    [[-0.18],[0.18]].forEach(e=>{const ear=new THREE.Mesh(new THREE.ConeGeometry(0.14,0.25,4),flat(0xf4a259));ear.position.set(e[0],1.05,0.6);g.add(ear);});
-    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.06,0.9,5),flat(0xf4a259));
-    tail.position.set(0,0.8,-0.7); tail.rotation.x=-0.8; g.add(tail);
-    return g;
+
+  function registerBlock(key, group, wx, wz, label, labelY, hitSize, tint){
+    const isle = buildSatelliteIsland(wx, wz, tint);
+    buildBridge(wx, wz);
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(hitSize,hitSize,hitSize), new THREE.MeshBasicMaterial({visible:false}));
+    hit.position.y = hitSize/2; group.add(hit);
+    group.add(textLabel(label, labelY));
+    group.position.set(0, 1.3, 0); isle.add(group);
+    group.userData = { key, baseY:1.3, phase:Math.random()*Math.PI*2, cube:hit, focus:new THREE.Vector3(wx,2,wz) };
+    blocks.push(group);
+    return isle;
   }
-  function buildDog(){
-    const g=body4leg(0x8d6e63,1,0.55,1.4);
-    const head=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.55,0.6),flat(0x8d6e63));
-    head.position.set(0,0.7,0.75); head.castShadow=true; g.add(head);
-    const snout=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.3),flat(0x5d4037));
-    snout.position.set(0,0.62,1.05); g.add(snout);
-    [[-0.3],[0.3]].forEach(e=>{const ear=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.35,0.1),flat(0x6d4c41));ear.position.set(e[0],0.85,0.7);g.add(ear);});
-    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.05,0.6,5),flat(0x8d6e63));
-    tail.position.set(0,0.8,-0.75); tail.rotation.x=0.9; g.add(tail);
-    return g;
+
+  // bigger satellite (custom radius) — used for family island
+  function registerBlockBig(key, group, wx, wz, label, labelY, hitSize, tint, r){
+    const isle = buildSatelliteIsland(wx, wz, tint, r);
+    buildBridge(wx, wz, r);
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(hitSize,hitSize,hitSize), new THREE.MeshBasicMaterial({visible:false}));
+    hit.position.y = hitSize/2; group.add(hit);
+    group.add(textLabel(label, labelY));
+    // house sits off to the back edge, leaving room for people
+    group.position.set(0, 1.3, -r*0.55); isle.add(group);
+    group.userData = { key, baseY:1.3, phase:Math.random()*Math.PI*2, cube:hit, focus:new THREE.Vector3(wx,2,wz) };
+    blocks.push(group);
+    return isle;
   }
-  function buildTurtle(){
+
+  // 5 satellites around the main island
+  registerBlock('personality', buildHeart(),       0, -17, '個性島', 3.2, 2.8, 0xffc2d1);
+  registerBlock('zoo',         buildZoo(),         17,   0, '動物島', 3.0, 2.4, 0xffe08a);
+  registerBlock('trips',       buildPlane(),        0,  17, '旅行島', 2.6, 2.2, 0xa9e6f0);
+  registerBlock('journey',     buildMilestone(),  -17,   0, '人生島', 3.1, 2.6, 0xc4f0d8);
+  // 親友島放遠一點、島做大一點，才放得下一群小人
+  const familyIsle = registerBlockBig('family', buildFamilyHouse(), 19, 19, '親友島', 3.4, 3.0, 0xffd6a5, 6.2);
+
+  // ========================= card data =========================
+  const DATA = {
+    personality: { ic:'✨', title:'她是怎樣的人', html:`
+      <div class="row"><div class="k">🎀</div><div class="v"><b>可愛</b><br>一舉一動都讓人融化，笑起來能照亮整座島。</div></div>
+      <div class="row"><div class="k">🤲</div><div class="v"><b>貼心</b><br>總是先想到別人，默默把溫暖準備好。</div></div>
+      <div class="row"><div class="k">💪</div><div class="v"><b>勤奮</b><br>認真又努力，設定目標就穩穩前進，超可靠。</div></div>` },
+    zoo: { ic:'🐾', title:'可愛動物園', html:`<div class="chips">
+      <span class="chip">🐱 貓</span><span class="chip">🐶 狗</span><span class="chip">🐢 烏龜</span>
+      <span class="chip">🐴 小馬</span><span class="chip">🐑 羊</span><span class="chip">🦎 變色龍</span>
+      </div><p style="text-align:center;margin-top:14px;color:#7a95a3">寶寶最愛的毛茸茸朋友們 💕</p>` },
+    trips: { ic:'✈️', title:'一起走過的旅行足跡', html:`
+      <div class="row"><div class="k">🇻🇳</div><div class="v"><b>富國島</b>　陽光、海灘與椰林</div></div>
+      <div class="row"><div class="k">🗼</div><div class="v"><b>東京</b>　繁華又浪漫的日本</div></div>
+      <div class="row"><div class="k">🌺</div><div class="v"><b>沖繩</b>　碧海藍天的度假島</div></div>
+      <div class="row"><div class="k">🇰🇷</div><div class="v"><b>釜山</b>　海港城市的悠閒</div></div>
+      <div class="row"><div class="k">🏔️</div><div class="v"><b>湯澤</b>　雪國溫泉的浪漫</div></div>` },
+    journey: { ic:'🗺️', title:'她的人生航線', html:`
+      <div class="row"><div class="k">👶</div><div class="v"><b>1994</b>　寶寶降臨世界，故事的起點。</div></div>
+      <div class="row"><div class="k">🎓</div><div class="v"><b>2016</b>　文化大學畢業，帶著夢想出發。</div></div>
+      <div class="row"><div class="k">🛋️</div><div class="v"><b>2019</b>　在 Crate &amp; Barrel 相遇。</div></div>
+      <div class="row"><div class="k">💑</div><div class="v"><b>2023</b>　正式在一起，島上有了我們。</div></div>` },
+    family: { ic:'👨‍👩‍👧‍👦', title:'我們的親友島', html:`
+      <div class="group-title">💖 Wendy 的家人</div>
+      <div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>
+      <div class="row"><div class="k">👩</div><div class="v"><b>媽媽</b></div></div>
+      <div class="row"><div class="k">👧</div><div class="v"><b>Jacky</b>　姐姐</div></div>
+      <div class="row"><div class="k">🧒</div><div class="v"><b>Summer</b>　姪女</div></div>
+      <div class="group-title">💙 我的家人</div>
+      <div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>
+      <div class="row"><div class="k">👩</div><div class="v"><b>媽媽</b></div></div>
+      <div class="row"><div class="k">👧</div><div class="v"><b>姐姐</b></div></div>
+      <div class="row"><div class="k">🤵</div><div class="v"><b>姊夫</b></div></div>
+      <div class="row"><div class="k">👭</div><div class="v"><b>兩個姪女</b></div></div>` },
+    propose: { ic:'💍', title:'Will you marry me?', html:`
+      <p style="text-align:center;color:#6b7b86;line-height:1.9;margin-bottom:6px">
+        親愛的寶寶，謝謝妳走進我的世界，成為這座島的名字。<br>
+        從 Crate &amp; Barrel 的相遇，到現在的每一天，<br>
+        我想把剩下的人生，都留在這座島上陪妳。</p>
+      <div id="propose-actions" style="text-align:center;margin-top:18px">
+        <button id="yesBtn">Yes, I do 💍</button></div>
+      <p id="propose-answer" style="display:none;text-align:center;margin-top:16px;font-size:1.3rem;color:#ff5d8f;font-weight:800;line-height:1.7">
+        💍 她戴上了戒指！<br>從今天起，Wendy 島永遠有我們兩個人 💑</p>` }
+  };
+
+  // ========================= residents (critters) =========================
+  const residents = [];
+  function critter(build, x, z, say){
+    const g = build();
+    g.position.set(x, 1.95, z); g.rotation.y = Math.random()*Math.PI*2;
+    const bubble = new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex(say),transparent:true,depthTest:false}));
+    bubble.scale.set(2.4,1.2,1); bubble.position.y=1.8; bubble.visible=false; g.add(bubble);
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(1.4,1.4,1.4), new THREE.MeshBasicMaterial({visible:false}));
+    hit.position.y=0.5; g.add(hit);
+    g.userData = { bubble, hit, baseY:1.95, phase:Math.random()*Math.PI*2, angle:Math.random()*Math.PI*2,
+      speed:0.15+Math.random()*0.15, turn:(Math.random()-0.5)*0.01 };
+    island.add(g); residents.push(g);
+  }
+  function body4leg(bodyColor,w,h,d){
     const g=new THREE.Group();
-    const shell=new THREE.Mesh(new THREE.SphereGeometry(0.6,8,6,0,Math.PI*2,0,Math.PI/2),flat(0x43aa8b));
-    shell.position.y=0.5; shell.scale.set(1,0.7,1.3); shell.castShadow=true; g.add(shell);
-    const belly=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.2,8),flat(0xf2cc8f));
-    belly.position.y=0.3; belly.scale.z=1.3; g.add(belly);
-    const head=new THREE.Mesh(new THREE.SphereGeometry(0.22,6,6),flat(0x90be6d));
-    head.position.set(0,0.4,0.85); g.add(head);
-    [[-0.35,0.6],[0.35,0.6],[-0.35,-0.6],[0.35,-0.6]].forEach(p=>{const f=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.12,0.3),flat(0x90be6d));f.position.set(p[0],0.3,p[1]);g.add(f);});
-    g.userData={body:shell};
+    const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),flat(bodyColor)); b.position.y=0.55; b.castShadow=true; g.add(b);
+    const legGeo=new THREE.BoxGeometry(0.16,0.4,0.16),legMat=flat(bodyColor);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat); l.position.set(p[0]*w/2.6,0.2,p[1]*d/2.6); g.add(l);});
     return g;
   }
-  function buildPony(){
-    const g=body4leg(0xffc8dd,0.8,0.7,1.4);
-    const neck=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.6,0.4),flat(0xffc8dd));
-    neck.position.set(0,0.95,0.6); neck.rotation.x=-0.4; g.add(neck);
-    const head=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.6),flat(0xffc8dd));
-    head.position.set(0,1.15,0.85); head.castShadow=true; g.add(head);
-    const mane=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.6,0.5),flat(0xcdb4db));
-    mane.position.set(0,1.0,0.45); g.add(mane);
-    const tail=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.6,0.2),flat(0xcdb4db));
-    tail.position.set(0,0.6,-0.75); tail.rotation.x=0.5; g.add(tail);
-    return g;
-  }
-  function buildSheep(){
-    const g=new THREE.Group();
-    const wool=new THREE.Mesh(new THREE.IcosahedronGeometry(0.65,0),flat(0xfff6ea));
-    wool.position.y=0.7; wool.scale.set(1.2,1,1.3); wool.castShadow=true; g.add(wool);
-    const head=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.4,0.4),flat(0x3d405b));
-    head.position.set(0,0.7,0.8); g.add(head);
-    [[-0.15],[0.15]].forEach(e=>{const ear=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.08,0.22),flat(0x3d405b));ear.position.set(e[0],0.78,0.75);g.add(ear);});
+  function buildCat(){ const g=body4leg(0xf4a259,0.9,0.55,1.3);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.55,0.55),flat(0xf4a259)); head.position.set(0,0.75,0.65); head.castShadow=true; g.add(head);
+    [[-0.18],[0.18]].forEach(e=>{const ear=new THREE.Mesh(new THREE.ConeGeometry(0.14,0.25,4),flat(0xf4a259)); ear.position.set(e[0],1.05,0.6); g.add(ear);});
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.06,0.9,5),flat(0xf4a259)); tail.position.set(0,0.8,-0.7); tail.rotation.x=-0.8; g.add(tail); return g; }
+  function buildDog(){ const g=body4leg(0x8d6e63,1,0.55,1.4);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.55,0.6),flat(0x8d6e63)); head.position.set(0,0.7,0.75); head.castShadow=true; g.add(head);
+    const snout=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.3),flat(0x5d4037)); snout.position.set(0,0.62,1.05); g.add(snout);
+    [[-0.3],[0.3]].forEach(e=>{const ear=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.35,0.1),flat(0x6d4c41)); ear.position.set(e[0],0.85,0.7); g.add(ear);});
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.05,0.6,5),flat(0x8d6e63)); tail.position.set(0,0.8,-0.75); tail.rotation.x=0.9; g.add(tail); return g; }
+  function buildTurtle(){ const g=new THREE.Group();
+    const shell=new THREE.Mesh(new THREE.SphereGeometry(0.6,8,6,0,Math.PI*2,0,Math.PI/2),flat(0x43aa8b)); shell.position.y=0.5; shell.scale.set(1,0.7,1.3); shell.castShadow=true; g.add(shell);
+    const belly=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.2,8),flat(0xf2cc8f)); belly.position.y=0.3; belly.scale.z=1.3; g.add(belly);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.22,6,6),flat(0x90be6d)); head.position.set(0,0.4,0.85); g.add(head);
+    [[-0.35,0.6],[0.35,0.6],[-0.35,-0.6],[0.35,-0.6]].forEach(p=>{const f=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.12,0.3),flat(0x90be6d)); f.position.set(p[0],0.3,p[1]); g.add(f);}); return g; }
+  function buildPony(){ const g=body4leg(0xffc8dd,0.8,0.7,1.4);
+    const neck=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.6,0.4),flat(0xffc8dd)); neck.position.set(0,0.95,0.6); neck.rotation.x=-0.4; g.add(neck);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.6),flat(0xffc8dd)); head.position.set(0,1.15,0.85); head.castShadow=true; g.add(head);
+    const mane=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.6,0.5),flat(0xcdb4db)); mane.position.set(0,1.0,0.45); g.add(mane);
+    const tail=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.6,0.2),flat(0xcdb4db)); tail.position.set(0,0.6,-0.75); tail.rotation.x=0.5; g.add(tail); return g; }
+  function buildSheep(){ const g=new THREE.Group();
+    const wool=new THREE.Mesh(new THREE.IcosahedronGeometry(0.65,0),flat(0xfff6ea)); wool.position.y=0.7; wool.scale.set(1.2,1,1.3); wool.castShadow=true; g.add(wool);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.4,0.4),flat(0x3d405b)); head.position.set(0,0.7,0.8); g.add(head);
+    [[-0.15],[0.15]].forEach(e=>{const ear=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.08,0.22),flat(0x3d405b)); ear.position.set(e[0],0.78,0.75); g.add(ear);});
     const legGeo=new THREE.BoxGeometry(0.12,0.4,0.12),legMat=flat(0x3d405b);
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat);l.position.set(p[0]*0.3,0.2,p[1]*0.35);g.add(l);});
-    g.userData={body:wool};
-    return g;
-  }
-  function buildChameleon(){
-    const g=new THREE.Group();
-    const b=new THREE.Mesh(new THREE.SphereGeometry(0.4,8,6),flat(0x80ed99));
-    b.position.y=0.55; b.scale.set(1,0.9,1.6); b.castShadow=true; g.add(b);
-    const head=new THREE.Mesh(new THREE.ConeGeometry(0.3,0.5,6),flat(0x57cc99));
-    head.rotation.x=Math.PI/2; head.position.set(0,0.7,0.65); g.add(head);
-    const eye=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,6),flat(0xffd166));
-    eye.position.set(0.18,0.8,0.5); g.add(eye);
-    // curled tail
-    const tail=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.07,6,10,Math.PI*1.5),flat(0x80ed99));
-    tail.position.set(0,0.5,-0.7); tail.rotation.y=Math.PI/2; g.add(tail);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat); l.position.set(p[0]*0.3,0.2,p[1]*0.35); g.add(l);}); return g; }
+  function buildChameleon(){ const g=new THREE.Group();
+    const b=new THREE.Mesh(new THREE.SphereGeometry(0.4,8,6),flat(0x80ed99)); b.position.y=0.55; b.scale.set(1,0.9,1.6); b.castShadow=true; g.add(b);
+    const head=new THREE.Mesh(new THREE.ConeGeometry(0.3,0.5,6),flat(0x57cc99)); head.rotation.x=Math.PI/2; head.position.set(0,0.7,0.65); g.add(head);
+    const eye=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,6),flat(0xffd166)); eye.position.set(0.18,0.8,0.5); g.add(eye);
+    const tail=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.07,6,10,Math.PI*1.5),flat(0x80ed99)); tail.position.set(0,0.5,-0.7); tail.rotation.y=Math.PI/2; g.add(tail);
     const legGeo=new THREE.BoxGeometry(0.1,0.3,0.1),legMat=flat(0x57cc99);
-    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat);l.position.set(p[0]*0.3,0.18,p[1]*0.4);g.add(l);});
-    g.userData={body:b};
-    return g;
-  }
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat); l.position.set(p[0]*0.3,0.18,p[1]*0.4); g.add(l);}); return g; }
 
   critter(buildCat,      -3,   3,  '喵～最愛寶寶');
   critter(buildDog,       5,  -1,  '汪！忠心陪伴');
@@ -572,318 +467,300 @@
   critter(buildSheep,     0,   5,  '咩～軟綿綿抱抱');
   critter(buildChameleon,-1.5, 2,  '我會為你變色');
 
-  // ======================================================
-  //  STAR RESIDENT — Wendy (main island centre)
-  // ======================================================
-  let wendy;
+  // ========================= star residents: Wendy + Me =========================
+  // --- Wendy (bride) ---
+  let wendy, wendyRing;
   (function buildWendy(){
     const g = new THREE.Group();
-    const skin = 0xffe0bd, hair = 0x5b3a29, dress = 0xff8fab;
-    // body (dress - cone)
-    const body = new THREE.Mesh(new THREE.ConeGeometry(0.9,1.8,10), flat(dress));
-    body.position.y = 0.9; body.castShadow = true; g.add(body);
-    // head
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.55,12,12), flat(skin));
-    head.position.y = 2.1; head.castShadow = true; g.add(head);
-    // hair (back)
-    const hairBack = new THREE.Mesh(new THREE.SphereGeometry(0.6,12,12), flat(hair));
-    hairBack.position.set(0,2.18,-0.08); hairBack.scale.set(1,1.05,1); g.add(hairBack);
-    const hairFringe = new THREE.Mesh(new THREE.SphereGeometry(0.58,12,12,0,Math.PI*2,0,Math.PI/2.4), flat(hair));
-    hairFringe.position.set(0,2.35,0); g.add(hairFringe);
-    // ponytails
-    [[-0.55],[0.55]].forEach(p=>{
-      const pt=new THREE.Mesh(new THREE.SphereGeometry(0.26,8,8),flat(hair));
-      pt.position.set(p[0],2.0,-0.1); pt.scale.set(1,1.4,1); g.add(pt);
-    });
-    // eyes
-    [[-0.2],[0.2]].forEach(p=>{
-      const e=new THREE.Mesh(new THREE.SphereGeometry(0.08,8,8),flat(0x2b2d42));
-      e.position.set(p[0],2.12,0.48); g.add(e);
-    });
-    // blush
-    [[-0.3],[0.3]].forEach(p=>{
-      const b=new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8),flat(0xff9ab0));
-      b.position.set(p[0],1.98,0.44); b.scale.set(1,0.6,0.4); g.add(b);
-    });
-    // arms
-    [[-1,0.9],[1,0.9]].forEach(p=>{
-      const a=new THREE.Mesh(new THREE.CapsuleGeometry(0.16,0.7,4,6),flat(skin));
-      a.position.set(p[0]*0.75,1.15,0); a.rotation.z=p[0]*0.5; g.add(a);
-    });
-    // crown
-    const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.5,0.35,8,1,true), flat(0xffd166));
-    crown.position.y = 2.75; g.add(crown);
-    for(let i=0;i<8;i++){
-      const spike=new THREE.Mesh(new THREE.ConeGeometry(0.1,0.22,4),flat(0xffd166));
-      const a=i*(Math.PI*2/8);
-      spike.position.set(Math.cos(a)*0.46,2.98,Math.sin(a)*0.46); g.add(spike);
-    }
-    const gem=new THREE.Mesh(new THREE.OctahedronGeometry(0.14,0),flat(0xff5d8f));
-    gem.position.set(0,2.78,0.46); g.add(gem);
-    // floating heart halo
-    const halo = new THREE.Group();
-    for(let i=0;i<6;i++){
-      const h=new THREE.Mesh(new THREE.TorusGeometry(0.12,0.05,6,8),flat(0xff5d8f));
-      const a=i*(Math.PI*2/6);
-      h.position.set(Math.cos(a)*1.1,3.4,Math.sin(a)*1.1); h.rotation.x=Math.PI/2;
-      halo.add(h);
-    }
-    g.add(halo);
+    const skin=0xffe0bd, hair=0x5b3a29, dress=0xff8fab;
+    const body=new THREE.Mesh(new THREE.ConeGeometry(0.9,1.8,10),flat(dress)); body.position.y=0.9; body.castShadow=true; g.add(body);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.55,12,12),flat(skin)); head.position.y=2.1; head.castShadow=true; g.add(head);
+    const hairBack=new THREE.Mesh(new THREE.SphereGeometry(0.6,12,12),flat(hair)); hairBack.position.set(0,2.18,-0.08); hairBack.scale.set(1,1.05,1); g.add(hairBack);
+    const fringe=new THREE.Mesh(new THREE.SphereGeometry(0.58,12,12,0,Math.PI*2,0,Math.PI/2.4),flat(hair)); fringe.position.set(0,2.35,0); g.add(fringe);
+    [[-0.55],[0.55]].forEach(p=>{const pt=new THREE.Mesh(new THREE.SphereGeometry(0.26,8,8),flat(hair)); pt.position.set(p[0],2.0,-0.1); pt.scale.set(1,1.4,1); g.add(pt);});
+    [[-0.2],[0.2]].forEach(p=>{const e=new THREE.Mesh(new THREE.SphereGeometry(0.08,8,8),flat(0x2b2d42)); e.position.set(p[0],2.12,0.48); g.add(e);});
+    [[-0.3],[0.3]].forEach(p=>{const b=new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8),flat(0xff9ab0)); b.position.set(p[0],1.98,0.44); b.scale.set(1,0.6,0.4); g.add(b);});
+    // left arm (holds ring hand forward)
+    const armL=new THREE.Group();
+    const upper=new THREE.Mesh(new THREE.CapsuleGeometry(0.16,0.7,4,6),flat(skin)); upper.position.set(-0.75,1.15,0); upper.rotation.z=0.5; armL.add(upper);
+    const hand=new THREE.Mesh(new THREE.SphereGeometry(0.16,8,8),flat(skin)); hand.position.set(-1.1,0.75,0.2); armL.add(hand);
+    // ring on hand (hidden until yes)
+    wendyRing=new THREE.Group();
+    const band=new THREE.Mesh(new THREE.TorusGeometry(0.11,0.035,8,16),new THREE.MeshStandardMaterial({color:0xffd700,metalness:0.9,roughness:0.2})); band.rotation.x=Math.PI/2; wendyRing.add(band);
+    const diamond=new THREE.Mesh(new THREE.OctahedronGeometry(0.1,0),new THREE.MeshStandardMaterial({color:0xcbeeff,metalness:0.3,roughness:0,emissive:0x88ccff,emissiveIntensity:0.4})); diamond.position.y=0.12; wendyRing.add(diamond);
+    wendyRing.position.set(-1.1,0.78,0.3); wendyRing.visible=false; armL.add(wendyRing);
+    g.add(armL);
+    const armR=new THREE.Mesh(new THREE.CapsuleGeometry(0.16,0.7,4,6),flat(skin)); armR.position.set(0.75,1.15,0); armR.rotation.z=-0.5; g.add(armR);
+    // hair flower
+    const flower=new THREE.Mesh(new THREE.DodecahedronGeometry(0.16,0),flat(0xffd166)); flower.position.set(0.4,2.4,0.2); g.add(flower);
 
-    // speech bubble
-    const bubble = new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex('點我 💍'),transparent:true,depthTest:false}));
-    bubble.scale.set(2.4,1.2,1); bubble.position.y=4.1; g.add(bubble);
+    const bubble=new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex('我願意～'),transparent:true,depthTest:false}));
+    bubble.scale.set(2.4,1.2,1); bubble.position.y=3.3; bubble.visible=false; g.add(bubble);
 
-    // hit box
-    const hit=new THREE.Mesh(new THREE.BoxGeometry(2,3.4,2),new THREE.MeshBasicMaterial({visible:false}));
-    hit.position.y=1.6; g.add(hit);
-
-    g.position.set(0, 1.95, 0);
-    g.userData = { halo, bubble, hit, baseY:1.95, phase:0 };
-    island.add(g);
-    wendy = g;
+    g.position.set(-1.4, 1.95, 0);
+    g.userData = { baseY:1.95, bubble };
+    island.add(g); wendy=g;
   })();
 
-  // ---------- raycast / click ----------
+  // --- Me (groom) ---
+  let me;
+  (function buildMe(){
+    const g=new THREE.Group();
+    const skin=0xf0c59a, hair=0x2b2016, shirt=0x4a6fa5, pants=0x2b2d42;
+    // legs
+    [[-0.22],[0.22]].forEach(p=>{const l=new THREE.Mesh(new THREE.CapsuleGeometry(0.17,0.7,4,6),flat(pants)); l.position.set(p[0],0.5,0); l.castShadow=true; g.add(l);});
+    // torso (shirt)
+    const torso=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.42,1.1,10),flat(shirt)); torso.position.y=1.35; torso.castShadow=true; g.add(torso);
+    // bow tie
+    const tie=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.12,0.1),flat(0xff5d8f)); tie.position.set(0,1.7,0.42); g.add(tie);
+    // head
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,12),flat(skin)); head.position.y=2.25; head.castShadow=true; g.add(head);
+    const hairMesh=new THREE.Mesh(new THREE.SphereGeometry(0.52,12,12,0,Math.PI*2,0,Math.PI/1.9),flat(hair)); hairMesh.position.set(0,2.33,0); g.add(hairMesh);
+    [[-0.17],[0.17]].forEach(p=>{const e=new THREE.Mesh(new THREE.SphereGeometry(0.07,8,8),flat(0x2b2d42)); e.position.set(p[0],2.28,0.44); g.add(e);});
+    // arms
+    [[-1,0],[1,0]].forEach(p=>{const a=new THREE.Mesh(new THREE.CapsuleGeometry(0.15,0.7,4,6),flat(shirt)); a.position.set(p[0]*0.62,1.4,0); a.rotation.z=p[0]*0.45; g.add(a);});
+    // ring box in hand (right hand forward) - disappears after yes
+    const box=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.3),flat(0xff5d8f)); box.position.set(0.95,1.15,0.3); g.add(box);
+    const lid=new THREE.Mesh(new THREE.BoxGeometry(0.32,0.12,0.32),flat(0xd43d6e)); lid.position.set(0.95,1.35,0.2); lid.rotation.x=-0.6; g.add(lid);
+    const ringInBox=new THREE.Mesh(new THREE.TorusGeometry(0.08,0.03,8,16),new THREE.MeshStandardMaterial({color:0xffd700,metalness:0.9,roughness:0.2})); ringInBox.position.set(0.95,1.28,0.3); ringInBox.rotation.x=Math.PI/2.2; g.add(ringInBox);
+
+    const bubble=new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex('點我 💍'),transparent:true,depthTest:false}));
+    bubble.scale.set(2.4,1.2,1); bubble.position.y=3.1; g.add(bubble);
+    const hit=new THREE.Mesh(new THREE.BoxGeometry(2,3,2),new THREE.MeshBasicMaterial({visible:false})); hit.position.y=1.4; g.add(hit);
+
+    g.position.set(1.4, 1.95, 0); g.rotation.y=-0.4;
+    g.userData = { baseY:1.95, bubble, hit, box, lid, ringInBox };
+    island.add(g); me=g;
+  })();
+
+  // ========================= family folks (little people on family island) =========================
+  const familyFolks = [];
+  // generic low-poly person. kind: 'man'|'woman'|'girl' ; scale for kids
+  function makePerson(opt){
+    const g = new THREE.Group();
+    const skin = opt.skin||0xf0c59a, hair = opt.hair||0x3a2a20, cloth = opt.cloth||0x6a89cc;
+    const s = opt.scale||1;                 // 1 = adult, ~0.65 = child
+    const kind = opt.kind||'man';
+    // legs / lower
+    if(kind==='woman' || kind==='girl'){
+      const skirt=new THREE.Mesh(new THREE.ConeGeometry(0.5*s,1.0*s,10),flat(cloth)); skirt.position.y=0.55*s; skirt.castShadow=true; g.add(skirt);
+    }else{
+      [[-0.16],[0.16]].forEach(p=>{const l=new THREE.Mesh(new THREE.CapsuleGeometry(0.11*s,0.5*s,4,6),flat(opt.pants||0x3a4a63)); l.position.set(p[0]*s,0.35*s,0); l.castShadow=true; g.add(l);});
+      const torso=new THREE.Mesh(new THREE.CylinderGeometry(0.32*s,0.28*s,0.75*s,8),flat(cloth)); torso.position.y=0.95*s; torso.castShadow=true; g.add(torso);
+    }
+    // arms
+    [[-1],[1]].forEach(p=>{const a=new THREE.Mesh(new THREE.CapsuleGeometry(0.09*s,0.5*s,4,6),flat(cloth)); a.position.set(p[0]*0.42*s,0.95*s,0); a.rotation.z=p[0]*0.35; g.add(a);});
+    // head
+    const headY = (kind==='man'?1.5:1.35)*s;
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.33*s,12,12),flat(skin)); head.position.y=headY; head.castShadow=true; g.add(head);
+    // hair
+    if(kind==='woman'){
+      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.37*s,12,12),flat(hair)); hb.position.set(0,headY+0.03*s,-0.05*s); hb.scale.set(1,1.1,1); g.add(hb);
+      const bun=new THREE.Mesh(new THREE.SphereGeometry(0.16*s,8,8),flat(hair)); bun.position.set(0,headY+0.1*s,-0.3*s); g.add(bun);
+    }else if(kind==='girl'){
+      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.36*s,12,12),flat(hair)); hb.position.set(0,headY+0.02*s,-0.04*s); g.add(hb);
+      [[-0.32],[0.32]].forEach(p=>{const pt=new THREE.Mesh(new THREE.SphereGeometry(0.15*s,8,8),flat(hair)); pt.position.set(p[0]*s,headY-0.05*s,-0.05*s); g.add(pt);});
+    }else{
+      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.35*s,12,12,0,Math.PI*2,0,Math.PI/1.9),flat(hair)); hb.position.set(0,headY+0.04*s,0); g.add(hb);
+    }
+    // eyes
+    [[-0.12],[0.12]].forEach(p=>{const e=new THREE.Mesh(new THREE.SphereGeometry(0.045*s,6,6),flat(0x2b2d42)); e.position.set(p[0]*s,headY-0.02*s,0.3*s); g.add(e);});
+    return g;
+  }
+
+  // place a family member on the family island (local coords of familyIsle)
+  function addFolk(opt, lx, lz, name){
+    const g = makePerson(opt);
+    const person = new THREE.Group();
+    person.add(g);
+    const bubble=new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex(name),transparent:true,depthTest:false}));
+    const topY = (opt.kind==='man'?2.0:1.8)*(opt.scale||1);
+    bubble.scale.set(2.2,1.1,1); bubble.position.y=topY+0.6; bubble.visible=false; person.add(bubble);
+    const hit=new THREE.Mesh(new THREE.BoxGeometry(1.1,2.2*(opt.scale||1),1.1),new THREE.MeshBasicMaterial({visible:false})); hit.position.y=topY/2; person.add(hit);
+    person.position.set(lx, 1.3, lz);
+    person.rotation.y = Math.atan2(-lx, -lz);   // roughly face island centre
+    person.userData = { bubble, hit, baseY:1.3, phase:Math.random()*Math.PI*2 };
+    familyIsle.add(person);
+    familyFolks.push(person);
+  }
+
+  // ---- Wendy's family (left cluster) ----
+  addFolk({kind:'man',  skin:0xf0c59a, hair:0x4a4a4a, cloth:0x5a7a9a}, -3.2, -0.5, "Wendy 爸爸");
+  addFolk({kind:'woman',skin:0xffe0bd, hair:0x6b4a32, cloth:0xff8fab}, -2.0, -1.4, "Wendy 媽媽");
+  addFolk({kind:'woman',skin:0xffe0bd, hair:0x8d5524, cloth:0xa29bfe}, -3.0,  1.0, "Jacky (姐)");
+  addFolk({kind:'girl', skin:0xffe0bd, hair:0x5b3a29, cloth:0xffd166, scale:0.62}, -1.6, 0.3, "Summer (姪女)");
+
+  // ---- My family (right cluster) ----
+  addFolk({kind:'man',  skin:0xeac086, hair:0x3a3a3a, cloth:0x4a6fa5}, 3.2, -0.5, "我 爸爸");
+  addFolk({kind:'woman',skin:0xf0c59a, hair:0x5a3a28, cloth:0xff9ab0}, 2.0, -1.4, "我 媽媽");
+  addFolk({kind:'woman',skin:0xf0c59a, hair:0x7a4a28, cloth:0x90be6d}, 3.0,  1.0, "我 姐姐");
+  addFolk({kind:'man',  skin:0xeac086, hair:0x2b2016, cloth:0x8d6e63}, 4.0,  0.2, "姊夫");
+  addFolk({kind:'girl', skin:0xf0c59a, hair:0x4a3020, cloth:0xffc8dd, scale:0.6}, 1.8, 0.6, "姪女①");
+  addFolk({kind:'girl', skin:0xf0c59a, hair:0x4a3020, cloth:0xa9e6f0, scale:0.58}, 2.6, 1.3, "姪女②");
+
+  // ========================= raycast / interaction =========================
   const ray = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  let hovered = null;
+  let hovered = null, hoveredCritter = null;
 
-  function pointer(e){
-    const t = e.touches ? e.touches[0] : e;
-    mouse.x = (t.clientX/innerWidth)*2-1;
-    mouse.y = -(t.clientY/innerHeight)*2+1;
-  }
-  function pick(){
-    ray.setFromCamera(mouse, camera);
-    const hits = ray.intersectObjects(blocks.map(b=>b.userData.cube), false);
-    return hits.length ? blocks.find(b=>b.userData.cube===hits[0].object) : null;
-  }
-  function pickCritter(){
-    ray.setFromCamera(mouse, camera);
-    const hits = ray.intersectObjects(residents.map(r=>r.userData.hit), false);
-    return hits.length ? residents.find(r=>r.userData.hit===hits[0].object) : null;
-  }
+  function pointer(e){ const t=e.touches?e.touches[0]:e; mouse.x=(t.clientX/innerWidth)*2-1; mouse.y=-(t.clientY/innerHeight)*2+1; }
+  function pick(){ ray.setFromCamera(mouse,camera); const h=ray.intersectObjects(blocks.map(b=>b.userData.cube),false); return h.length?blocks.find(b=>b.userData.cube===h[0].object):null; }
+  function pickCritter(){ ray.setFromCamera(mouse,camera); const h=ray.intersectObjects(residents.map(r=>r.userData.hit),false); return h.length?residents.find(r=>r.userData.hit===h[0].object):null; }
+  function pickMe(){ ray.setFromCamera(mouse,camera); return ray.intersectObject(me.userData.hit,false).length?me:null; }
+  function pickFolk(){ ray.setFromCamera(mouse,camera); const h=ray.intersectObjects(familyFolks.map(f=>f.userData.hit),false); return h.length?familyFolks.find(f=>f.userData.hit===h[0].object):null; }
+  let hoveredFolk = null;
 
-  let hoveredCritter = null;
   renderer.domElement.addEventListener('pointermove', e=>{
     pointer(e);
-    const b = pick();
-    if(b!==hovered){ hovered = b; }
-    const c = pickCritter();
-    if(c!==hoveredCritter){
-      if(hoveredCritter) hoveredCritter.userData.bubble.visible = false;
-      hoveredCritter = c;
-      if(c) c.userData.bubble.visible = true;
-    }
-    const w = pickWendy();
-    renderer.domElement.style.cursor = (b||c||w) ? 'pointer' : 'grab';
+    const b=pick(); if(b!==hovered) hovered=b;
+    const c=pickCritter();
+    if(c!==hoveredCritter){ if(hoveredCritter) hoveredCritter.userData.bubble.visible=false; hoveredCritter=c; if(c) c.userData.bubble.visible=true; }
+    const f=pickFolk();
+    if(f!==hoveredFolk){ if(hoveredFolk) hoveredFolk.userData.bubble.visible=false; hoveredFolk=f; if(f) f.userData.bubble.visible=true; }
+    const m=pickMe();
+    renderer.domElement.style.cursor=(b||c||m||f)?'pointer':'grab';
   });
-
-  function pickWendy(){
-    ray.setFromCamera(mouse, camera);
-    const hits = ray.intersectObject(wendy.userData.hit, false);
-    return hits.length ? wendy : null;
-  }
 
   let downX=0, downY=0;
   renderer.domElement.addEventListener('pointerdown', e=>{ downX=e.clientX; downY=e.clientY; });
   renderer.domElement.addEventListener('pointerup', e=>{
-    if(Math.abs(e.clientX-downX)>6 || Math.abs(e.clientY-downY)>6) return; // was a drag
+    if(Math.abs(e.clientX-downX)>6 || Math.abs(e.clientY-downY)>6) return;
     pointer(e);
-    // Wendy first (centre star)
-    if(pickWendy()){ flyTo(new THREE.Vector3(0,2.2,0), 9); openCard('propose'); return; }
-    const b = pick();
-    if(b){ flyTo(b.userData.focus, 11); openCard(b.userData.key); return; }
-    const c = pickCritter();
-    if(c){ c.userData.bubble.visible = true; openCard('zoo'); }
+    if(pickMe()){ flyTo(new THREE.Vector3(0,2.2,0), 9); openCard('propose'); return; }
+    const b=pick(); if(b){ flyTo(b.userData.focus, 11); openCard(b.userData.key); return; }
+    const f=pickFolk(); if(f){ f.userData.bubble.visible=true; flyTo(new THREE.Vector3(19,2,19), 13); openCard('family'); return; }
+    const c=pickCritter(); if(c){ c.userData.bubble.visible=true; openCard('zoo'); }
   });
 
-  // ---------- camera fly-to ----------
+  // ========================= camera fly-to =========================
   function flyTo(targetPoint, dist){
-    // compute a camera position: pull back from target toward current view direction
-    const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-    const camTo = new THREE.Vector3().copy(targetPoint).add(dir.multiplyScalar(dist));
-    camTo.y = Math.max(camTo.y, targetPoint.y + 3);
-    fly = { camFrom:camera.position.clone(), camTo, tgtFrom:controls.target.clone(), tgtTo:targetPoint.clone(), t:0 };
-    controls.autoRotate = false;
+    const dir=new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+    const camTo=new THREE.Vector3().copy(targetPoint).add(dir.multiplyScalar(dist));
+    camTo.y=Math.max(camTo.y, targetPoint.y+3);
+    fly={ camFrom:camera.position.clone(), camTo, tgtFrom:controls.target.clone(), tgtTo:targetPoint.clone(), t:0 };
+    controls.autoRotate=false;
   }
 
-  // ---------- card ----------
+  // ========================= card =========================
   const cardEl = document.getElementById('card');
   function openCard(key){
-    const d = DATA[key];
-    document.getElementById('card-ic').textContent = d.ic;
-    document.getElementById('card-title').textContent = d.title;
-    document.getElementById('card-body').innerHTML = d.html;
+    const d=DATA[key];
+    document.getElementById('card-ic').textContent=d.ic;
+    document.getElementById('card-title').textContent=d.title;
+    document.getElementById('card-body').innerHTML=d.html;
     cardEl.classList.toggle('propose', key==='propose');
     cardEl.classList.add('show');
-    controls.autoRotate = false;
-    hintEl.style.opacity = 0;
+    controls.autoRotate=false; hintEl.style.opacity=0;
     if(key==='propose') wirePropose();
   }
-  function closeCard(){ cardEl.classList.remove('show'); controls.autoRotate = true; }
+  function closeCard(){ cardEl.classList.remove('show'); controls.autoRotate=true; }
   cardEl.querySelector('.close').addEventListener('click', closeCard);
   addEventListener('keydown', e=>{ if(e.key==='Escape') closeCard(); });
 
-  // ---------- propose interaction ----------
+  // ========================= propose =========================
   function wirePropose(){
-    const btn = document.getElementById('yesBtn');
+    const btn=document.getElementById('yesBtn');
     if(!btn) return;
-    // make the "no" feeling impossible: only a Yes button, and it celebrates
-    const run = ()=>{
+    btn.addEventListener('click', ()=>{
       document.getElementById('propose-actions').style.display='none';
       document.getElementById('propose-answer').style.display='block';
       confettiBurst();
-      proposeActive = true;   // trigger 3D heart rain
-    };
-    btn.addEventListener('click', run);
+      proposeActive=true;
+      giveRing();
+    });
   }
-
-  // DOM confetti
+  function giveRing(){
+    if(ringGiven) return; ringGiven=true;
+    // show ring on Wendy, show her bubble, remove groom's ring box
+    if(wendyRing) wendyRing.visible=true;
+    if(wendy) wendy.userData.bubble.visible=true;
+    if(me){ ['box','lid','ringInBox'].forEach(k=>{ if(me.userData[k]) me.userData[k].visible=false; }); }
+  }
   function confettiBurst(){
     const emojis=['💖','💍','🎉','💕','✨','💗'];
-    for(let i=0;i<60;i++){
-      const s=document.createElement('div');
-      s.textContent=emojis[i%emojis.length];
+    for(let i=0;i<70;i++){
+      const s=document.createElement('div'); s.textContent=emojis[i%emojis.length];
       s.style.cssText=`position:fixed;left:${Math.random()*100}vw;top:-40px;font-size:${18+Math.random()*22}px;z-index:40;pointer-events:none;transition:transform ${2+Math.random()*2}s linear, opacity 3s`;
       document.body.appendChild(s);
-      requestAnimationFrame(()=>{
-        s.style.transform=`translateY(${100+Math.random()*20}vh) rotate(${Math.random()*720-360}deg)`;
-        s.style.opacity='0';
-      });
+      requestAnimationFrame(()=>{ s.style.transform=`translateY(${100+Math.random()*20}vh) rotate(${Math.random()*720-360}deg)`; s.style.opacity='0'; });
       setTimeout(()=>s.remove(),4500);
     }
   }
 
-  // ---------- resize ----------
-  addEventListener('resize', ()=>{
-    camera.aspect = innerWidth/innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-  });
-
-  // ---------- 3D heart rain ----------
-  const heartGeoShape = (()=> {
-    const sh=new THREE.Shape();
-    sh.moveTo(0,0.5);
-    sh.bezierCurveTo(0,0.9,-0.5,1.2,-0.9,0.7);
-    sh.bezierCurveTo(-1.4,0.1,-0.5,-0.5,0,-1);
-    sh.bezierCurveTo(0.5,-0.5,1.4,0.1,0.9,0.7);
-    sh.bezierCurveTo(0.5,1.2,0,0.9,0,0.5);
-    const g=new THREE.ExtrudeGeometry(sh,{depth:0.3,bevelEnabled:false});
-    g.center(); g.scale(0.4,0.4,0.4);
-    return g;
-  })();
-  const rainHearts=[];
-  let rainInit=false;
+  // ========================= 3D heart rain =========================
+  const heartGeoShape=(()=>{ const sh=new THREE.Shape();
+    sh.moveTo(0,0.5); sh.bezierCurveTo(0,0.9,-0.5,1.2,-0.9,0.7); sh.bezierCurveTo(-1.4,0.1,-0.5,-0.5,0,-1);
+    sh.bezierCurveTo(0.5,-0.5,1.4,0.1,0.9,0.7); sh.bezierCurveTo(0.5,1.2,0,0.9,0,0.5);
+    const g=new THREE.ExtrudeGeometry(sh,{depth:0.3,bevelEnabled:false}); g.center(); g.scale(0.4,0.4,0.4); return g; })();
+  const rainHearts=[]; let rainInit=false;
   function initHeartRain(){
     const cols=[0xff5d8f,0xff8fab,0xffd166,0xffffff];
-    for(let i=0;i<40;i++){
-      const m=new THREE.Mesh(heartGeoShape, flat(cols[i%cols.length]));
-      m.position.set((Math.random()-0.5)*30, 8+Math.random()*12, (Math.random()-0.5)*30);
-      m.userData={vy:0.04+Math.random()*0.06, spin:(Math.random()-0.5)*0.1, startY:m.position.y};
-      scene.add(m); rainHearts.push(m);
-    }
+    for(let i=0;i<40;i++){ const m=new THREE.Mesh(heartGeoShape,flat(cols[i%cols.length]));
+      m.position.set((Math.random()-0.5)*36,10+Math.random()*14,(Math.random()-0.5)*36);
+      m.userData={vy:0.04+Math.random()*0.06,spin:(Math.random()-0.5)*0.1}; scene.add(m); rainHearts.push(m); }
     rainInit=true;
   }
   function heartRainStep(){
     if(!rainInit) initHeartRain();
-    rainHearts.forEach(h=>{
-      h.position.y -= h.userData.vy*4;
-      h.rotation.y += h.userData.spin;
-      h.rotation.z += h.userData.spin*0.5;
-      if(h.position.y < -2){ h.position.y = 10+Math.random()*10; h.position.x=(Math.random()-0.5)*30; h.position.z=(Math.random()-0.5)*30; }
-    });
+    rainHearts.forEach(h=>{ h.position.y-=h.userData.vy*4; h.rotation.y+=h.userData.spin; h.rotation.z+=h.userData.spin*0.5;
+      if(h.position.y<-2){ h.position.y=12+Math.random()*12; h.position.x=(Math.random()-0.5)*36; h.position.z=(Math.random()-0.5)*36; } });
   }
 
-  // ---------- animate ----------
+  // ========================= resize =========================
+  addEventListener('resize', ()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+  // ========================= animate =========================
   const clock = new THREE.Clock();
   function animate(){
     requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
 
-    // wavy sea
-    const pos = sea.geometry.attributes.position;
-    for(let i=0;i<pos.count;i++){
-      const ix = i*3;
-      const x = seaBase[ix], y = seaBase[ix+1];
-      pos.array[ix+2] = Math.sin(x*0.3 + t*1.2)*0.25 + Math.cos(y*0.3 + t)*0.25;
-    }
-    pos.needsUpdate = true;
+    // sea waves
+    const pos=sea.geometry.attributes.position;
+    for(let i=0;i<pos.count;i++){ const ix=i*3; const x=seaBase[ix], y=seaBase[ix+1];
+      pos.array[ix+2]=Math.sin(x*0.3+t*1.2)*0.25+Math.cos(y*0.3+t)*0.25; }
+    pos.needsUpdate=true;
 
-    // floating main island
-    island.position.y = Math.sin(t*0.8)*0.18;
+    island.position.y=Math.sin(t*0.8)*0.18;
+    satellites.forEach(s=>{ s.group.position.y=s.baseY+Math.sin(t*0.7+s.phase)*0.3; });
 
-    // floating satellite islands (each with its own bob)
-    satellites.forEach(s=>{
-      s.group.position.y = 0.6 + Math.sin(t*0.7 + s.phase)*0.3;
+    // Wendy + Me idle
+    if(wendy){ wendy.position.y=wendy.userData.baseY+Math.sin(t*1.1)*0.1; wendy.rotation.y=0.4+Math.sin(t*0.5)*0.15; }
+    if(me){ me.position.y=me.userData.baseY+Math.sin(t*1.1+1)*0.1; }
+
+    if(fly){ fly.t=Math.min(1,fly.t+0.02); const e=1-Math.pow(1-fly.t,3);
+      camera.position.lerpVectors(fly.camFrom,fly.camTo,e); controls.target.lerpVectors(fly.tgtFrom,fly.tgtTo,e); if(fly.t>=1) fly=null; }
+
+    if(proposeActive) heartRainStep();
+
+    // landmarks bob + hover
+    blocks.forEach(b=>{ b.position.y=b.userData.baseY+Math.sin(t*1.5+b.userData.phase)*0.15; b.rotation.y+=0.004;
+      const target=(b===hovered)?1.18:1; b.scale.lerp(new THREE.Vector3(target,target,target),0.15); });
+
+    // residents wander
+    residents.forEach(r=>{ const u=r.userData; u.angle+=u.turn+0.004;
+      const nx=r.position.x+Math.sin(u.angle)*u.speed*0.08, nz=r.position.z+Math.cos(u.angle)*u.speed*0.08;
+      if(Math.hypot(nx,nz)<6.3){ r.position.x=nx; r.position.z=nz; } else { u.angle+=Math.PI; u.turn=(Math.random()-0.5)*0.02; }
+      r.rotation.y=u.angle;
+      r.position.y=u.baseY+Math.abs(Math.sin(t*4+u.phase))*0.12;
+      const s=(r===hoveredCritter)?1.22:1; r.scale.lerp(new THREE.Vector3(s,s,s),0.18); });
+
+    clouds.forEach((c,i)=>{ c.position.x+=0.01+i*0.003; if(c.position.x>30) c.position.x=-30; });
+
+    // family folks: gentle sway + hover pop
+    familyFolks.forEach(f=>{
+      const u=f.userData;
+      f.position.y=u.baseY+Math.sin(t*2+u.phase)*0.06;
+      f.rotation.z=Math.sin(t*1.5+u.phase)*0.03;
+      const s=(f===hoveredFolk)?1.18:1; f.scale.lerp(new THREE.Vector3(s,s,s),0.18);
     });
 
-    // Wendy: gentle spin, bob, rotating halo
-    if(wendy){
-      wendy.position.y = wendy.userData.baseY + Math.sin(t*1.1)*0.12;
-      wendy.rotation.y = Math.sin(t*0.4)*0.5;
-      wendy.userData.halo.rotation.y += 0.02;
-    }
-
-    // camera fly-to easing
-    if(fly){
-      fly.t = Math.min(1, fly.t + 0.02);
-      const e = 1-Math.pow(1-fly.t,3);   // easeOutCubic
-      camera.position.lerpVectors(fly.camFrom, fly.camTo, e);
-      controls.target.lerpVectors(fly.tgtFrom, fly.tgtTo, e);
-      if(fly.t>=1) fly=null;
-    }
-
-    // 3D heart rain when she says yes
-    if(proposeActive) heartRainStep(t);
-
-    // bobbing blocks + hover scale
-    blocks.forEach(b=>{
-      b.position.y = b.userData.baseY + Math.sin(t*1.5 + b.userData.phase)*0.15;
-      b.rotation.y += 0.004;
-      const target = (b===hovered) ? 1.18 : 1;
-      b.scale.lerp(new THREE.Vector3(target,target,target), 0.15);
-    });
-
-    // wandering residents
-    residents.forEach(r=>{
-      const u = r.userData;
-      u.angle += u.turn + 0.004;
-      // move forward along facing direction
-      const nx = r.position.x + Math.sin(u.angle)*u.speed*0.08;
-      const nz = r.position.z + Math.cos(u.angle)*u.speed*0.08;
-      // keep within island disc (radius ~6.3)
-      if(Math.hypot(nx,nz) < 6.3){
-        r.position.x = nx; r.position.z = nz;
-      } else {
-        u.angle += Math.PI;      // bounce back inward
-        u.turn = (Math.random()-0.5)*0.02;
-      }
-      r.rotation.y = u.angle;
-      // little hop + float with island
-      const hop = Math.abs(Math.sin(t*4 + u.phase))*0.12;
-      r.position.y = u.baseY + hop;
-      // gentle scale-up on hover (whole critter)
-      const s = (r===hoveredCritter)?1.22:1;
-      r.scale.lerp(new THREE.Vector3(s,s,s), 0.18);
-    });
-
-    // drifting clouds
-    clouds.forEach((c,i)=>{
-      c.position.x += 0.01 + i*0.003;
-      if(c.position.x > 26) c.position.x = -26;
-    });
-
-    controls.update();
-    renderer.render(scene, camera);
+    controls.update(); renderer.render(scene, camera);
   }
   animate();
 
-  // hide loader
   setTimeout(()=> loaderEl.classList.add('hide'), 500);
-  setTimeout(()=>{ hintEl.style.opacity = 0; }, 9000);
+  setTimeout(()=>{ hintEl.style.opacity=0; }, 10000);
   </script>
 </body>
 </html>
