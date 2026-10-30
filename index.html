@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wendy 島｜寶寶・我的女朋友</title>
+<style>
+  :root{
+    --sea-deep:#2a6f97;
+    --sea:#468faf;
+    --sea-light:#a9d6e5;
+    --sand:#ffe8d6;
+    --coral:#ff8fab;
+    --coral-deep:#ff5d8f;
+    --sun:#ffd166;
+    --leaf:#90be6d;
+    --ink:#2b2d42;
+    --cream:#fffaf3;
+    --shadow:rgba(42,111,151,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,#caf0f8 0%,#ade8f4 40%,#a9d6e5 100%);
+    overflow-x:hidden;
+  }
+
+  /* ---------- floating decorations ---------- */
+  .cloud{position:absolute;background:#fff;border-radius:50px;opacity:.75;filter:blur(.3px);animation:drift linear infinite}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  @keyframes drift{from{transform:translateX(-20vw)}to{transform:translateX(120vw)}}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;overflow:hidden;
+    padding:40px 20px;
+  }
+  .hero .waves{position:absolute;bottom:0;left:0;width:100%;height:140px;overflow:hidden}
+  .hero .waves svg{width:200%;height:100%;animation:wave 9s ease-in-out infinite}
+  @keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-25%)}}
+
+  .island{
+    position:relative;width:min(340px,80vw);height:min(340px,80vw);margin-bottom:10px;
+    animation:bob 5s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .island .base{
+    position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;height:64%;background:linear-gradient(180deg,var(--sand) 0%,#f4a261 100%);
+    border-radius:50% 50% 46% 46%/70% 70% 40% 40%;box-shadow:0 24px 40px var(--shadow);
+  }
+  .island .hill{
+    position:absolute;bottom:34%;left:50%;transform:translateX(-50%);
+    width:58%;height:46%;background:linear-gradient(180deg,#b7e4c7,var(--leaf));
+    border-radius:50% 50% 40% 40%/80% 80% 20% 20%;
+  }
+  .island .palm{position:absolute;bottom:60%;left:50%;transform:translateX(-50%);font-size:68px;line-height:1;filter:drop-shadow(0 6px 6px rgba(0,0,0,.12))}
+  .island .flag{position:absolute;top:2%;left:50%;transform:translateX(-50%);font-size:40px;animation:bob 3.5s ease-in-out infinite}
+
+  .hero h1{
+    font-size:clamp(2.6rem,9vw,5rem);color:#fff;letter-spacing:2px;
+    text-shadow:0 4px 0 var(--coral),0 10px 24px var(--shadow);margin-top:6px;
+  }
+  .hero .sub{
+    margin-top:18px;font-size:clamp(1rem,3.2vw,1.35rem);color:var(--sea-deep);
+    background:rgba(255,255,255,.65);padding:10px 22px;border-radius:999px;
+    backdrop-filter:blur(4px);box-shadow:0 8px 18px var(--shadow);
+  }
+  .hero .sub b{color:var(--coral-deep)}
+  .scrolldown{position:absolute;bottom:24px;font-size:28px;color:var(--sea-deep);animation:bob 2s infinite;z-index:3}
+
+  /* ---------- sections ---------- */
+  section{padding:80px 20px;position:relative}
+  .wrap{max-width:1040px;margin:0 auto}
+  .title{
+    text-align:center;font-size:clamp(1.8rem,5vw,2.6rem);color:var(--sea-deep);margin-bottom:8px;
+  }
+  .title .emoji{display:inline-block;animation:bob 3s ease-in-out infinite}
+  .lead{text-align:center;color:#5a7a8c;margin-bottom:44px;font-size:1.05rem}
+
+  .personality{background:linear-gradient(180deg,#a9d6e5,#fff6ea)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+  .card{
+    background:var(--cream);border-radius:24px;padding:32px 26px;text-align:center;
+    box-shadow:0 14px 30px var(--shadow);border:3px solid #fff;
+    transition:transform .3s,box-shadow .3s;
+  }
+  .card:hover{transform:translateY(-10px) rotate(-1deg);box-shadow:0 22px 44px var(--shadow)}
+  .card .ic{font-size:56px}
+  .card h3{margin:14px 0 8px;font-size:1.5rem;color:var(--coral-deep)}
+  .card p{color:#6b7b86;line-height:1.7}
+
+  .likes{background:linear-gradient(180deg,#fff6ea,#ffe8d6)}
+
+  .zoo{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:18px;margin-bottom:60px}
+  .animal{
+    cursor:pointer;background:#fff;border-radius:22px;padding:24px 10px;text-align:center;
+    box-shadow:0 10px 22px var(--shadow);border:3px solid transparent;
+    transition:transform .25s,border-color .25s;user-select:none;
+  }
+  .animal:hover{transform:translateY(-8px) scale(1.04)}
+  .animal.active{border-color:var(--coral);transform:translateY(-8px) scale(1.06)}
+  .animal .face{font-size:56px;display:block;transition:transform .3s}
+  .animal:hover .face{transform:scale(1.2) rotate(8deg)}
+  .animal .name{margin-top:10px;font-weight:700;color:var(--sea-deep)}
+  .animal .say{display:block;margin-top:6px;min-height:18px;color:var(--coral-deep);font-size:.9rem;font-weight:700;opacity:0;transition:opacity .3s}
+  .animal.active .say{opacity:1}
+
+  .subtitle{text-align:center;font-size:1.3rem;color:var(--sea-deep);margin-bottom:22px;font-weight:700}
+
+  .trips{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px}
+  .trip{
+    position:relative;border-radius:22px;overflow:hidden;min-height:150px;color:#fff;
+    display:flex;flex-direction:column;justify-content:flex-end;padding:18px;
+    box-shadow:0 12px 26px var(--shadow);transition:transform .3s;
+  }
+  .trip:hover{transform:translateY(-8px)}
+  .trip span.flag{font-size:40px;position:absolute;top:14px;right:16px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+  .trip h4{font-size:1.4rem;text-shadow:0 2px 6px rgba(0,0,0,.35)}
+  .trip p{font-size:.9rem;opacity:.95;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .trip:nth-child(1){background:linear-gradient(135deg,#00b4d8,#0077b6)}
+  .trip:nth-child(2){background:linear-gradient(135deg,#ff8fab,#ff5d8f)}
+  .trip:nth-child(3){background:linear-gradient(135deg,#48cae4,#0096c7)}
+  .trip:nth-child(4){background:linear-gradient(135deg,#f9844a,#f3722c)}
+  .trip:nth-child(5){background:linear-gradient(135deg,#90be6d,#43aa8b)}
+
+  /* ---------- timeline ---------- */
+  .journey{background:linear-gradient(180deg,#ffe8d6,#a9d6e5)}
+  .timeline{position:relative;max-width:760px;margin:0 auto;padding:20px 0}
+  .timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;
+    background:repeating-linear-gradient(#fff,#fff 10px,transparent 10px,transparent 20px);transform:translateX(-50%)}
+  .tl-item{position:relative;width:50%;padding:18px 34px;opacity:0;transform:translateY(30px);transition:all .6s}
+  .tl-item.show{opacity:1;transform:none}
+  .tl-item:nth-child(odd){left:0;text-align:right}
+  .tl-item:nth-child(even){left:50%}
+  .tl-item .dot{position:absolute;top:26px;width:22px;height:22px;border-radius:50%;
+    background:var(--coral);border:4px solid #fff;box-shadow:0 0 0 3px var(--coral-deep)}
+  .tl-item:nth-child(odd) .dot{right:-11px}
+  .tl-item:nth-child(even) .dot{left:-11px}
+  .tl-card{background:var(--cream);border-radius:20px;padding:20px 22px;box-shadow:0 12px 26px var(--shadow);display:inline-block;text-align:left;max-width:100%}
+  .tl-card .yr{font-size:1.5rem;font-weight:800;color:var(--coral-deep)}
+  .tl-card .ev{margin-top:6px;color:#55707f;line-height:1.6}
+  .tl-card .big{font-size:30px}
+
+  /* ---------- footer ---------- */
+  footer{text-align:center;padding:60px 20px 80px;background:var(--sea-deep);color:#fff}
+  footer .heart{font-size:50px;animation:beat 1.4s infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.25)}}
+  footer p{margin-top:14px;opacity:.9;line-height:1.8}
+  footer .small{font-size:.85rem;opacity:.6;margin-top:18px}
+
+  @media(max-width:640px){
+    .timeline::before{left:22px}
+    .tl-item,.tl-item:nth-child(even){width:100%;left:0;text-align:left;padding-left:52px;padding-right:12px}
+    .tl-item:nth-child(odd){text-align:left}
+    .tl-item:nth-child(odd) .dot,.tl-item:nth-child(even) .dot{left:11px;right:auto}
+  }
+</style>
+</head>
+<body>
+
+  <a href="island3d.html" style="position:fixed;top:16px;right:16px;z-index:30;background:rgba(255,255,255,.85);color:#2a6f97;text-decoration:none;padding:9px 18px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 6px 16px rgba(42,111,151,.25)">🏝️ 進入 3D 島 →</a>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="cloud" style="top:12%;width:90px;height:26px;animation-duration:38s"></div>
+    <div class="cloud" style="top:24%;width:60px;height:18px;animation-duration:50s;animation-delay:-10s"></div>
+    <div class="cloud" style="top:8%;width:120px;height:32px;animation-duration:60s;animation-delay:-30s"></div>
+
+    <div class="island">
+      <div class="flag">🚩</div>
+      <div class="palm">🌴</div>
+      <div class="hill"></div>
+      <div class="base"></div>
+    </div>
+
+    <h1>Wendy 島</h1>
+    <p class="sub">暱稱 <b>寶寶</b> ・ 我的女朋友 ・ <b>讓人又愛又恨</b> 😤❤️</p>
+
+    <div class="waves">
+      <svg viewBox="0 0 1440 140" preserveAspectRatio="none">
+        <path fill="#ffffff" fill-opacity="0.6" d="M0,64 C240,120 480,0 720,48 C960,96 1200,16 1440,64 L1440,140 L0,140 Z"></path>
+        <path fill="#ffffff" fill-opacity="0.9" d="M0,96 C240,56 480,120 720,88 C960,56 1200,120 1440,96 L1440,140 L0,140 Z"></path>
+      </svg>
+    </div>
+    <div class="scrolldown">↓</div>
+  </header>
+
+  <!-- ===== PERSONALITY ===== -->
+  <section class="personality">
+    <div class="wrap">
+      <h2 class="title"><span class="emoji">✨</span> 她是怎樣的人</h2>
+      <p class="lead">登島前，先認識一下島主的性格</p>
+      <div class="cards">
+        <div class="card">
+          <div class="ic">🎀</div>
+          <h3>可愛</h3>
+          <p>一舉一動都讓人融化，笑起來能照亮整座島的那種可愛。</p>
+        </div>
+        <div class="card">
+          <div class="ic">🤲</div>
+          <h3>貼心</h3>
+          <p>總是先想到別人，默默把溫暖準備好，細膩又會照顧人。</p>
+        </div>
+        <div class="card">
+          <div class="ic">💪</div>
+          <h3>勤奮</h3>
+          <p>認真又努力，設定好目標就一步一步穩穩前進，超可靠。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIKES ===== -->
+  <section class="likes">
+    <div class="wrap">
+      <h2 class="title"><span class="emoji">💖</span> 她喜歡的事物</h2>
+      <p class="lead">點一點動物，聽聽牠們想對寶寶說什麼</p>
+
+      <p class="subtitle">🐾 可愛動物園</p>
+      <div class="zoo" id="zoo">
+        <div class="animal" data-say="喵～最愛寶寶"><span class="face">🐱</span><span class="name">貓</span><span class="say"></span></div>
+        <div class="animal" data-say="汪！忠心陪伴"><span class="face">🐶</span><span class="name">狗</span><span class="say"></span></div>
+        <div class="animal" data-say="慢慢來，有我在"><span class="face">🐢</span><span class="name">烏龜</span><span class="say"></span></div>
+        <div class="animal" data-say="嘶～帶你去冒險"><span class="face">🐴</span><span class="name">小馬</span><span class="say"></span></div>
+        <div class="animal" data-say="咩～軟綿綿抱抱"><span class="face">🐑</span><span class="name">羊</span><span class="say"></span></div>
+        <div class="animal" data-say="我會為你變色"><span class="face">🦎</span><span class="name">變色龍</span><span class="say"></span></div>
+      </div>
+
+      <p class="subtitle">✈️ 一起走過的旅行足跡</p>
+      <div class="trips">
+        <div class="trip"><span class="flag">🇻🇳</span><h4>富國島</h4><p>陽光、海灘與椰林</p></div>
+        <div class="trip"><span class="flag">🗼</span><h4>東京</h4><p>繁華又浪漫的日本</p></div>
+        <div class="trip"><span class="flag">🌺</span><h4>沖繩</h4><p>碧海藍天的度假島</p></div>
+        <div class="trip"><span class="flag">🇰🇷</span><h4>釜山</h4><p>海港城市的悠閒</p></div>
+        <div class="trip"><span class="flag">🏔️</span><h4>湯澤</h4><p>雪國溫泉的浪漫</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== JOURNEY ===== -->
+  <section class="journey">
+    <div class="wrap">
+      <h2 class="title"><span class="emoji">🗺️</span> 她的人生航線</h2>
+      <p class="lead">從出生到相遇，一路走到我身邊</p>
+      <div class="timeline" id="timeline">
+        <div class="tl-item"><div class="dot"></div><div class="tl-card"><div class="yr">1994</div><div class="ev"><span class="big">👶</span><br>寶寶降臨世界，故事的起點。</div></div></div>
+        <div class="tl-item"><div class="dot"></div><div class="tl-card"><div class="yr">2016</div><div class="ev"><span class="big">🎓</span><br>文化大學畢業，帶著夢想出發。</div></div></div>
+        <div class="tl-item"><div class="dot"></div><div class="tl-card"><div class="yr">2019</div><div class="ev"><span class="big">🛋️</span><br>在 Crate &amp; Barrel 相遇，命運悄悄牽起線。</div></div></div>
+        <div class="tl-item"><div class="dot"></div><div class="tl-card"><div class="yr">2023</div><div class="ev"><span class="big">💑</span><br>正式在一起，從此島上有了我們。</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="heart">💗</div>
+    <p>歡迎來到 <b>Wendy 島</b><br>這座島的名字叫做「寶寶」，而我是常駐居民。</p>
+    <p class="small">Made with 💛 for Wendy</p>
+  </footer>
+
+<script>
+  // animal click
+  document.querySelectorAll('#zoo .animal').forEach(function(a){
+    a.addEventListener('click',function(){
+      var say=a.getAttribute('data-say');
+      a.querySelector('.say').textContent=say;
+      a.classList.toggle('active');
+    });
+  });
+
+  // timeline reveal on scroll
+  var items=document.querySelectorAll('.tl-item');
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('show'); });
+  },{threshold:.3});
+  items.forEach(function(i){io.observe(i)});
+</script>
+</body>
+</html>

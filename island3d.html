@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wendy 島 3D｜寶寶・我的女朋友</title>
+<style>
+  :root{
+    --coral:#ff5d8f;
+    --sea-deep:#2a6f97;
+    --ink:#2b2d42;
+    --cream:#fffaf3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;font-family:"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif}
+  #app{position:fixed;inset:0}
+  canvas{display:block}
+
+  /* ---- loading ---- */
+  #loader{
+    position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;
+    background:linear-gradient(180deg,#caf0f8,#a9d6e5);color:var(--sea-deep);
+    transition:opacity .6s;
+  }
+  #loader.hide{opacity:0;pointer-events:none}
+  .spin{width:54px;height:54px;border:6px solid #fff;border-top-color:var(--coral);
+    border-radius:50%;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ---- title overlay ---- */
+  #title{
+    position:fixed;top:26px;left:0;width:100%;text-align:center;z-index:10;
+    pointer-events:none;
+  }
+  #title h1{
+    font-size:clamp(2rem,7vw,3.6rem);color:#fff;letter-spacing:2px;
+    text-shadow:0 3px 0 var(--coral),0 8px 20px rgba(42,111,151,.4);
+  }
+  #title p{
+    margin-top:8px;font-size:clamp(.9rem,3vw,1.15rem);color:var(--sea-deep);
+    display:inline-block;background:rgba(255,255,255,.7);padding:6px 18px;border-radius:999px;
+  }
+  #title p b{color:var(--coral)}
+
+  /* ---- hint ---- */
+  #hint{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;
+    background:rgba(255,255,255,.8);color:var(--sea-deep);padding:9px 20px;border-radius:999px;
+    font-size:.9rem;box-shadow:0 6px 18px rgba(42,111,151,.25);white-space:nowrap;
+    transition:opacity .5s;
+  }
+
+  /* ---- info card ---- */
+  #card{
+    position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%) scale(.85);
+    width:min(420px,88vw);max-height:80vh;overflow:auto;background:var(--cream);
+    border-radius:24px;padding:28px 26px 26px;box-shadow:0 24px 60px rgba(42,111,151,.4);
+    border:4px solid #fff;opacity:0;pointer-events:none;transition:all .3s;
+  }
+  #card.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  #card .close{position:absolute;top:12px;right:16px;font-size:26px;cursor:pointer;color:#bbb;border:none;background:none}
+  #card .close:hover{color:var(--coral)}
+  #card .ic{font-size:50px;text-align:center}
+  #card h2{text-align:center;color:var(--coral);margin:8px 0 16px;font-size:1.6rem}
+  #card .body{color:#55707f;line-height:1.75;font-size:1.02rem}
+  #card .body .row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #ffe0ea}
+  #card .body .row:last-child{border-bottom:none}
+  #card .body .row .k{font-size:28px;flex:0 0 auto}
+  #card .body .row .v b{color:var(--coral)}
+  #card .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  #card .chip{background:#fff0f5;color:var(--coral);padding:8px 14px;border-radius:999px;font-weight:700;font-size:.95rem}
+
+  /* ---- 2d link ---- */
+  #back2d{
+    position:fixed;top:18px;right:18px;z-index:10;background:rgba(255,255,255,.85);
+    color:var(--sea-deep);text-decoration:none;padding:8px 16px;border-radius:999px;
+    font-size:.88rem;font-weight:700;box-shadow:0 6px 16px rgba(42,111,151,.25);
+  }
+  #back2d:hover{background:#fff}
+</style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="loader">
+    <div class="spin"></div>
+    <div>正在組合 Wendy 島…</div>
+  </div>
+
+  <div id="title">
+    <h1>Wendy 島</h1>
+    <p>暱稱 <b>寶寶</b> ・ 我的女朋友 ・ <b>讓人又愛又恨</b> 😤❤️</p>
+  </div>
+
+  <a id="back2d" href="index.html">← 2D 版</a>
+
+  <div id="hint">🖱️ 拖曳旋轉 ・ 滾輪縮放 ・ 點島上的方塊探索</div>
+
+  <div id="card">
+    <button class="close" aria-label="close">×</button>
+    <div class="ic" id="card-ic">💖</div>
+    <h2 id="card-title">標題</h2>
+    <div class="body" id="card-body"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+  const loaderEl = document.getElementById('loader');
+  const hintEl = document.getElementById('hint');
+
+  // ---------- scene ----------
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xbfe9f5);
+  scene.fog = new THREE.Fog(0xbfe9f5, 30, 70);
+
+  const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+  camera.position.set(14, 11, 16);
+
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.getElementById('app').appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 10;
+  controls.maxDistance = 40;
+  controls.maxPolarAngle = Math.PI/2.15;
+  controls.target.set(0, 1.5, 0);
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.6;
+
+  // ---------- lights ----------
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x88bbdd, 0.9));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.1);
+  sun.position.set(12, 20, 10);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -25; sun.shadow.camera.right = 25;
+  sun.shadow.camera.top = 25; sun.shadow.camera.bottom = -25;
+  scene.add(sun);
+
+  // ---------- helpers ----------
+  const flat = (c) => new THREE.MeshStandardMaterial({ color:c, flatShading:true, roughness:.9, metalness:0 });
+
+  // ---------- sea ----------
+  const seaGeo = new THREE.PlaneGeometry(120, 120, 60, 60);
+  const seaMat = new THREE.MeshStandardMaterial({ color:0x4ba3c7, flatShading:true, roughness:.6, transparent:true, opacity:.95 });
+  const sea = new THREE.Mesh(seaGeo, seaMat);
+  sea.rotation.x = -Math.PI/2;
+  sea.position.y = -0.4;
+  sea.receiveShadow = true;
+  scene.add(sea);
+  const seaBase = seaGeo.attributes.position.array.slice();
+
+  // ---------- island ----------
+  const island = new THREE.Group();
+  scene.add(island);
+
+  // sand (cone-ish cylinder)
+  const sand = new THREE.Mesh(new THREE.CylinderGeometry(9, 11, 2.2, 10), flat(0xffe0b3));
+  sand.position.y = 0.1; sand.castShadow = sand.receiveShadow = true;
+  island.add(sand);
+
+  // dirt underside
+  const dirt = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 2, 5, 9), flat(0xb5835a));
+  dirt.position.y = -3; island.add(dirt);
+
+  // grass top
+  const grass = new THREE.Mesh(new THREE.CylinderGeometry(7.6, 9, 1.2, 10), flat(0x8cd17d));
+  grass.position.y = 1.3; grass.castShadow = grass.receiveShadow = true;
+  island.add(grass);
+
+  // little hill
+  const hill = new THREE.Mesh(new THREE.ConeGeometry(3.2, 3.2, 8), flat(0x72c267));
+  hill.position.set(-3.2, 2.6, -2.6); hill.castShadow = true;
+  island.add(hill);
+
+  // ---------- trees ----------
+  function palm(x, z, s=1){
+    const g = new THREE.Group();
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.18, .3, 3*s, 6), flat(0xb07a43));
+    trunk.position.y = 1.5*s; trunk.castShadow = true; g.add(trunk);
+    for(let i=0;i<5;i++){
+      const leaf = new THREE.Mesh(new THREE.ConeGeometry(.35*s, 2.2*s, 5), flat(0x5fb85a));
+      leaf.position.y = 3*s; leaf.rotation.z = Math.PI/2.6;
+      leaf.rotation.y = i*(Math.PI*2/5);
+      leaf.position.x = Math.cos(i*(Math.PI*2/5))*1.1*s;
+      leaf.position.z = Math.sin(i*(Math.PI*2/5))*1.1*s;
+      leaf.castShadow = true; g.add(leaf);
+    }
+    g.position.set(x, 1.8, z); g.scale.setScalar(s);
+    island.add(g);
+  }
+  palm(4.5, -3.5, 1.1);
+  palm(-5.5, 1.5, 0.9);
+  palm(2, 4.8, 1);
+
+  // decorative rocks + flag
+  const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(.9, 0), flat(0xa9b4bc));
+  rock.position.set(5, 1.8, 3); rock.castShadow = true; island.add(rock);
+
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,4,6), flat(0xdddddd));
+  pole.position.set(-3.2, 5.6, -2.6); island.add(pole);
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.6,1), new THREE.MeshStandardMaterial({color:0xff5d8f,flatShading:true,side:THREE.DoubleSide}));
+  flag.position.set(-2.45, 6.6, -2.6); island.add(flag);
+
+  // ---------- clouds ----------
+  const clouds = [];
+  function cloud(x,y,z){
+    const g = new THREE.Group();
+    const m = flat(0xffffff);
+    [[0,0,0,1.4],[1.2,-.2,0,1],[-1.2,-.1,.2,.9],[.3,.6,-.3,.8]].forEach(p=>{
+      const s = new THREE.Mesh(new THREE.IcosahedronGeometry(p[3],0), m);
+      s.position.set(p[0],p[1],p[2]); g.add(s);
+    });
+    g.position.set(x,y,z); g.scale.setScalar(1.3);
+    scene.add(g); clouds.push(g);
+  }
+  cloud(-10,9,-6); cloud(11,11,2); cloud(2,12,-12);
+
+  // ---------- interactive blocks ----------
+  const DATA = {
+    personality: {
+      ic:'✨', title:'她是怎樣的人',
+      html:`
+        <div class="row"><div class="k">🎀</div><div class="v"><b>可愛</b><br>一舉一動都讓人融化，笑起來能照亮整座島。</div></div>
+        <div class="row"><div class="k">🤲</div><div class="v"><b>貼心</b><br>總是先想到別人，默默把溫暖準備好。</div></div>
+        <div class="row"><div class="k">💪</div><div class="v"><b>勤奮</b><br>認真又努力，設定目標就穩穩前進，超可靠。</div></div>`
+    },
+    zoo: {
+      ic:'🐾', title:'可愛動物園',
+      html:`<div class="chips">
+        <span class="chip">🐱 貓</span><span class="chip">🐶 狗</span>
+        <span class="chip">🐢 烏龜</span><span class="chip">🐴 小馬</span>
+        <span class="chip">🐑 羊</span><span class="chip">🦎 變色龍</span>
+      </div><p style="text-align:center;margin-top:14px;color:#7a95a3">寶寶最愛的毛茸茸朋友們 💕</p>`
+    },
+    trips: {
+      ic:'✈️', title:'一起走過的旅行足跡',
+      html:`
+        <div class="row"><div class="k">🇻🇳</div><div class="v"><b>富國島</b>　陽光、海灘與椰林</div></div>
+        <div class="row"><div class="k">🗼</div><div class="v"><b>東京</b>　繁華又浪漫的日本</div></div>
+        <div class="row"><div class="k">🌺</div><div class="v"><b>沖繩</b>　碧海藍天的度假島</div></div>
+        <div class="row"><div class="k">🇰🇷</div><div class="v"><b>釜山</b>　海港城市的悠閒</div></div>
+        <div class="row"><div class="k">🏔️</div><div class="v"><b>湯澤</b>　雪國溫泉的浪漫</div></div>`
+    },
+    journey: {
+      ic:'🗺️', title:'她的人生航線',
+      html:`
+        <div class="row"><div class="k">👶</div><div class="v"><b>1994</b>　寶寶降臨世界，故事的起點。</div></div>
+        <div class="row"><div class="k">🎓</div><div class="v"><b>2016</b>　文化大學畢業，帶著夢想出發。</div></div>
+        <div class="row"><div class="k">🛋️</div><div class="v"><b>2019</b>　在 Crate &amp; Barrel 相遇。</div></div>
+        <div class="row"><div class="k">💑</div><div class="v"><b>2023</b>　正式在一起，島上有了我們。</div></div>`
+    }
+  };
+
+  // ======================================================
+  //  INTERACTIVE LANDMARK MODELS (low-poly, specific shapes)
+  // ======================================================
+  const blocks = [];
+
+  function textLabel(label, y){
+    const lc = document.createElement('canvas'); lc.width=256; lc.height=64;
+    const lx = lc.getContext('2d');
+    lx.fillStyle='#2a6f97'; lx.font='bold 34px "Microsoft JhengHei",sans-serif';
+    lx.textAlign='center'; lx.textBaseline='middle'; lx.fillText(label,128,36);
+    const ltex = new THREE.CanvasTexture(lc);
+    const lspr = new THREE.Sprite(new THREE.SpriteMaterial({ map:ltex, transparent:true, depthTest:false }));
+    lspr.scale.set(3,0.75,1); lspr.position.y = y;
+    return lspr;
+  }
+
+  // registers a landmark: `pickMesh` is the invisible/real hit target
+  function registerBlock(key, group, x, z, label, labelY, hitSize){
+    // invisible hit box so the whole model is clickable
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(hitSize,hitSize,hitSize),
+                 new THREE.MeshBasicMaterial({visible:false}));
+    hit.position.y = hitSize/2;
+    group.add(hit);
+    group.add(textLabel(label, labelY));
+    group.position.set(x, 1.95, z);
+    group.userData = { key, baseY:1.95, phase:Math.random()*Math.PI*2, cube:hit };
+    island.add(group);
+    blocks.push(group);
+  }
+
+  // --- 個性：愛心 ---
+  function buildHeart(){
+    const g = new THREE.Group();
+    const shape = new THREE.Shape();
+    shape.moveTo(0,0.5);
+    shape.bezierCurveTo(0,0.9, -0.5,1.2, -0.9,0.7);
+    shape.bezierCurveTo(-1.4,0.1, -0.5,-0.5, 0,-1);
+    shape.bezierCurveTo(0.5,-0.5, 1.4,0.1, 0.9,0.7);
+    shape.bezierCurveTo(0.5,1.2, 0,0.9, 0,0.5);
+    const geo = new THREE.ExtrudeGeometry(shape,{depth:0.5,bevelEnabled:true,bevelThickness:0.12,bevelSize:0.12,bevelSegments:1,steps:1});
+    geo.center();
+    const heart = new THREE.Mesh(geo, flat(0xff5d8f));
+    heart.scale.setScalar(1.1); heart.position.y = 1.2; heart.castShadow = true;
+    g.add(heart);
+    return g;
+  }
+
+  // --- 動物園：柵欄 + 招牌 ---
+  function buildZoo(){
+    const g = new THREE.Group();
+    const postMat = flat(0xcf9b6a), railMat = flat(0xe8c39e);
+    for(let i=-1;i<=1;i++){
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.22,1.1,0.22), postMat);
+      p.position.set(i*0.9,0.55,0); p.castShadow=true; g.add(p);
+    }
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(2.1,0.2,0.15), railMat);
+    rail.position.set(0,0.75,0); g.add(rail);
+    const rail2 = rail.clone(); rail2.position.y=0.45; g.add(rail2);
+    // sign board
+    const board = new THREE.Mesh(new THREE.BoxGeometry(1.5,0.8,0.12), flat(0xffd166));
+    board.position.set(0,1.7,0); board.castShadow=true; g.add(board);
+    const paw = new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('🐾'),transparent:true}));
+    paw.scale.set(0.7,0.7,1); paw.position.set(0,1.7,0.1); g.add(paw);
+    return g;
+  }
+
+  // --- 旅行：小飛機 ---
+  function buildPlane(){
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.6,4,8), flat(0xffffff));
+    body.rotation.z = Math.PI/2; body.position.y=1.2; body.castShadow=true; g.add(body);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.4,0.6,8), flat(0xff5d8f));
+    nose.rotation.z=-Math.PI/2; nose.position.set(1.3,1.2,0); g.add(nose);
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.1,2.6), flat(0x90e0ef));
+    wing.position.y=1.2; wing.castShadow=true; g.add(wing);
+    const tailW = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.1,1), flat(0x90e0ef));
+    tailW.position.set(-1.1,1.25,0); g.add(tailW);
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.6,0.1), flat(0xff5d8f));
+    fin.position.set(-1.1,1.55,0); g.add(fin);
+    return g;
+  }
+
+  // --- 人生：里程碑路標 ---
+  function buildMilestone(){
+    const g = new THREE.Group();
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,2.2,8), flat(0xb5835a));
+    post.position.y=1.1; post.castShadow=true; g.add(post);
+    const cols = [0xff5d8f,0xffd166,0x90e0ef];
+    cols.forEach((c,i)=>{
+      const s = new THREE.Mesh(new THREE.BoxGeometry(1.4,0.4,0.14), flat(c));
+      s.position.set(i%2?0.3:-0.3, 1.9-i*0.5, 0);
+      s.rotation.y = i%2?0.2:-0.2; s.castShadow=true; g.add(s);
+    });
+    const star = new THREE.Mesh(new THREE.DodecahedronGeometry(0.35,0), flat(0xffe066));
+    star.position.y=2.4; star.castShadow=true; g.add(star);
+    return g;
+  }
+
+  // emoji -> texture helper
+  function emojiTex(e,size=128){
+    const cv=document.createElement('canvas'); cv.width=cv.height=size;
+    const c=cv.getContext('2d'); c.font=`${size*0.7}px serif`;
+    c.textAlign='center'; c.textBaseline='middle'; c.fillText(e,size/2,size*0.56);
+    return new THREE.CanvasTexture(cv);
+  }
+
+  registerBlock('personality', buildHeart(),    0,   0,   '個性',   3.2, 2.8);
+  registerBlock('zoo',         buildZoo(),      4.2, 1.5, '動物園', 3.0, 2.4);
+  registerBlock('trips',       buildPlane(),   -4,  -2.2, '旅行',   2.6, 2.2);
+  registerBlock('journey',     buildMilestone(),1.5,-4.2, '人生',   3.1, 2.6);
+
+  // ======================================================
+  //  ISLAND RESIDENTS (cute low-poly critters that wander)
+  // ======================================================
+  const residents = [];
+  function critter(build, x, z, say){
+    const g = build();
+    g.position.set(x, 1.95, z);
+    g.rotation.y = Math.random()*Math.PI*2;
+    // speech bubble sprite (hidden until hover)
+    const bubble = new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex(say),transparent:true,depthTest:false}));
+    bubble.scale.set(2.4,1.2,1); bubble.position.y=1.8; bubble.visible=false;
+    g.add(bubble);
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(1.4,1.4,1.4), new THREE.MeshBasicMaterial({visible:false}));
+    hit.position.y=0.5; g.add(hit);
+    g.userData = {
+      bubble, hit,
+      baseY:1.95,
+      phase:Math.random()*Math.PI*2,
+      angle:Math.random()*Math.PI*2,
+      speed:0.15+Math.random()*0.15,
+      radius:1.5+Math.random()*3.5,
+      cx:x, cz:z, turn:(Math.random()-0.5)*0.01
+    };
+    island.add(g);
+    residents.push(g);
+  }
+  function bubbleTex(text){
+    const cv=document.createElement('canvas'); cv.width=256; cv.height=128;
+    const c=cv.getContext('2d');
+    c.fillStyle='rgba(255,255,255,.95)';
+    roundRect(c,8,8,240,86,22); c.fill();
+    c.beginPath(); c.moveTo(118,92); c.lineTo(138,92); c.lineTo(128,118); c.closePath(); c.fill();
+    c.fillStyle='#ff5d8f'; c.font='bold 30px "Microsoft JhengHei",sans-serif';
+    c.textAlign='center'; c.textBaseline='middle'; c.fillText(text,128,50);
+    return new THREE.CanvasTexture(cv);
+  }
+  function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+
+  // --- critter builders ---
+  function body4leg(bodyColor, w,h,d){
+    const g=new THREE.Group();
+    const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),flat(bodyColor));
+    b.position.y=0.55; b.castShadow=true; g.add(b);
+    const legGeo=new THREE.BoxGeometry(0.16,0.4,0.16), legMat=flat(bodyColor);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
+      const l=new THREE.Mesh(legGeo,legMat);
+      l.position.set(p[0]*w/2.6,0.2,p[1]*d/2.6); g.add(l);
+    });
+    g.userData={body:b};
+    return g;
+  }
+  function buildCat(){
+    const g=body4leg(0xf4a259,0.9,0.55,1.3);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.55,0.55),flat(0xf4a259));
+    head.position.set(0,0.75,0.65); head.castShadow=true; g.add(head);
+    [[-0.18],[0.18]].forEach(e=>{const ear=new THREE.Mesh(new THREE.ConeGeometry(0.14,0.25,4),flat(0xf4a259));ear.position.set(e[0],1.05,0.6);g.add(ear);});
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.06,0.9,5),flat(0xf4a259));
+    tail.position.set(0,0.8,-0.7); tail.rotation.x=-0.8; g.add(tail);
+    return g;
+  }
+  function buildDog(){
+    const g=body4leg(0x8d6e63,1,0.55,1.4);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.55,0.6),flat(0x8d6e63));
+    head.position.set(0,0.7,0.75); head.castShadow=true; g.add(head);
+    const snout=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.3),flat(0x5d4037));
+    snout.position.set(0,0.62,1.05); g.add(snout);
+    [[-0.3],[0.3]].forEach(e=>{const ear=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.35,0.1),flat(0x6d4c41));ear.position.set(e[0],0.85,0.7);g.add(ear);});
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.05,0.6,5),flat(0x8d6e63));
+    tail.position.set(0,0.8,-0.75); tail.rotation.x=0.9; g.add(tail);
+    return g;
+  }
+  function buildTurtle(){
+    const g=new THREE.Group();
+    const shell=new THREE.Mesh(new THREE.SphereGeometry(0.6,8,6,0,Math.PI*2,0,Math.PI/2),flat(0x43aa8b));
+    shell.position.y=0.5; shell.scale.set(1,0.7,1.3); shell.castShadow=true; g.add(shell);
+    const belly=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.2,8),flat(0xf2cc8f));
+    belly.position.y=0.3; belly.scale.z=1.3; g.add(belly);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.22,6,6),flat(0x90be6d));
+    head.position.set(0,0.4,0.85); g.add(head);
+    [[-0.35,0.6],[0.35,0.6],[-0.35,-0.6],[0.35,-0.6]].forEach(p=>{const f=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.12,0.3),flat(0x90be6d));f.position.set(p[0],0.3,p[1]);g.add(f);});
+    g.userData={body:shell};
+    return g;
+  }
+  function buildPony(){
+    const g=body4leg(0xffc8dd,0.8,0.7,1.4);
+    const neck=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.6,0.4),flat(0xffc8dd));
+    neck.position.set(0,0.95,0.6); neck.rotation.x=-0.4; g.add(neck);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.6),flat(0xffc8dd));
+    head.position.set(0,1.15,0.85); head.castShadow=true; g.add(head);
+    const mane=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.6,0.5),flat(0xcdb4db));
+    mane.position.set(0,1.0,0.45); g.add(mane);
+    const tail=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.6,0.2),flat(0xcdb4db));
+    tail.position.set(0,0.6,-0.75); tail.rotation.x=0.5; g.add(tail);
+    return g;
+  }
+  function buildSheep(){
+    const g=new THREE.Group();
+    const wool=new THREE.Mesh(new THREE.IcosahedronGeometry(0.65,0),flat(0xfff6ea));
+    wool.position.y=0.7; wool.scale.set(1.2,1,1.3); wool.castShadow=true; g.add(wool);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.4,0.4),flat(0x3d405b));
+    head.position.set(0,0.7,0.8); g.add(head);
+    [[-0.15],[0.15]].forEach(e=>{const ear=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.08,0.22),flat(0x3d405b));ear.position.set(e[0],0.78,0.75);g.add(ear);});
+    const legGeo=new THREE.BoxGeometry(0.12,0.4,0.12),legMat=flat(0x3d405b);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat);l.position.set(p[0]*0.3,0.2,p[1]*0.35);g.add(l);});
+    g.userData={body:wool};
+    return g;
+  }
+  function buildChameleon(){
+    const g=new THREE.Group();
+    const b=new THREE.Mesh(new THREE.SphereGeometry(0.4,8,6),flat(0x80ed99));
+    b.position.y=0.55; b.scale.set(1,0.9,1.6); b.castShadow=true; g.add(b);
+    const head=new THREE.Mesh(new THREE.ConeGeometry(0.3,0.5,6),flat(0x57cc99));
+    head.rotation.x=Math.PI/2; head.position.set(0,0.7,0.65); g.add(head);
+    const eye=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,6),flat(0xffd166));
+    eye.position.set(0.18,0.8,0.5); g.add(eye);
+    // curled tail
+    const tail=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.07,6,10,Math.PI*1.5),flat(0x80ed99));
+    tail.position.set(0,0.5,-0.7); tail.rotation.y=Math.PI/2; g.add(tail);
+    const legGeo=new THREE.BoxGeometry(0.1,0.3,0.1),legMat=flat(0x57cc99);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat);l.position.set(p[0]*0.3,0.18,p[1]*0.4);g.add(l);});
+    g.userData={body:b};
+    return g;
+  }
+
+  critter(buildCat,      -3,   3,  '喵～最愛寶寶');
+  critter(buildDog,       5,  -1,  '汪！忠心陪伴');
+  critter(buildTurtle,    2.5, 3.5,'慢慢來，有我在');
+  critter(buildPony,     -5.5,-1,  '帶你去冒險');
+  critter(buildSheep,     0,   5,  '咩～軟綿綿抱抱');
+  critter(buildChameleon,-1.5, 2,  '我會為你變色');
+
+  // ---------- raycast / click ----------
+  const ray = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let hovered = null;
+
+  function pointer(e){
+    const t = e.touches ? e.touches[0] : e;
+    mouse.x = (t.clientX/innerWidth)*2-1;
+    mouse.y = -(t.clientY/innerHeight)*2+1;
+  }
+  function pick(){
+    ray.setFromCamera(mouse, camera);
+    const hits = ray.intersectObjects(blocks.map(b=>b.userData.cube), false);
+    return hits.length ? blocks.find(b=>b.userData.cube===hits[0].object) : null;
+  }
+  function pickCritter(){
+    ray.setFromCamera(mouse, camera);
+    const hits = ray.intersectObjects(residents.map(r=>r.userData.hit), false);
+    return hits.length ? residents.find(r=>r.userData.hit===hits[0].object) : null;
+  }
+
+  let hoveredCritter = null;
+  renderer.domElement.addEventListener('pointermove', e=>{
+    pointer(e);
+    const b = pick();
+    if(b!==hovered){ hovered = b; }
+    const c = pickCritter();
+    if(c!==hoveredCritter){
+      if(hoveredCritter) hoveredCritter.userData.bubble.visible = false;
+      hoveredCritter = c;
+      if(c) c.userData.bubble.visible = true;
+    }
+    renderer.domElement.style.cursor = (b||c) ? 'pointer' : 'grab';
+  });
+
+  let downX=0, downY=0;
+  renderer.domElement.addEventListener('pointerdown', e=>{ downX=e.clientX; downY=e.clientY; });
+  renderer.domElement.addEventListener('pointerup', e=>{
+    if(Math.abs(e.clientX-downX)>6 || Math.abs(e.clientY-downY)>6) return; // was a drag
+    pointer(e);
+    const b = pick();
+    if(b){ openCard(b.userData.key); return; }
+    const c = pickCritter();
+    if(c){ c.userData.bubble.visible = true; openCard('zoo'); }
+  });
+
+  // ---------- card ----------
+  const cardEl = document.getElementById('card');
+  function openCard(key){
+    const d = DATA[key];
+    document.getElementById('card-ic').textContent = d.ic;
+    document.getElementById('card-title').textContent = d.title;
+    document.getElementById('card-body').innerHTML = d.html;
+    cardEl.classList.add('show');
+    controls.autoRotate = false;
+    hintEl.style.opacity = 0;
+  }
+  function closeCard(){ cardEl.classList.remove('show'); controls.autoRotate = true; }
+  cardEl.querySelector('.close').addEventListener('click', closeCard);
+  addEventListener('keydown', e=>{ if(e.key==='Escape') closeCard(); });
+
+  // ---------- resize ----------
+  addEventListener('resize', ()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  // ---------- animate ----------
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // wavy sea
+    const pos = sea.geometry.attributes.position;
+    for(let i=0;i<pos.count;i++){
+      const ix = i*3;
+      const x = seaBase[ix], y = seaBase[ix+1];
+      pos.array[ix+2] = Math.sin(x*0.3 + t*1.2)*0.25 + Math.cos(y*0.3 + t)*0.25;
+    }
+    pos.needsUpdate = true;
+
+    // floating island
+    island.position.y = Math.sin(t*0.8)*0.18;
+
+    // bobbing blocks + hover scale
+    blocks.forEach(b=>{
+      b.position.y = b.userData.baseY + Math.sin(t*1.5 + b.userData.phase)*0.15;
+      b.rotation.y += 0.004;
+      const target = (b===hovered) ? 1.18 : 1;
+      b.scale.lerp(new THREE.Vector3(target,target,target), 0.15);
+    });
+
+    // wandering residents
+    residents.forEach(r=>{
+      const u = r.userData;
+      u.angle += u.turn + 0.004;
+      // move forward along facing direction
+      const nx = r.position.x + Math.sin(u.angle)*u.speed*0.08;
+      const nz = r.position.z + Math.cos(u.angle)*u.speed*0.08;
+      // keep within island disc (radius ~6.3)
+      if(Math.hypot(nx,nz) < 6.3){
+        r.position.x = nx; r.position.z = nz;
+      } else {
+        u.angle += Math.PI;      // bounce back inward
+        u.turn = (Math.random()-0.5)*0.02;
+      }
+      r.rotation.y = u.angle;
+      // little hop + float with island
+      const hop = Math.abs(Math.sin(t*4 + u.phase))*0.12;
+      r.position.y = u.baseY + hop;
+      // gentle scale-up on hover (whole critter)
+      const s = (r===hoveredCritter)?1.22:1;
+      r.scale.lerp(new THREE.Vector3(s,s,s), 0.18);
+    });
+
+    // drifting clouds
+    clouds.forEach((c,i)=>{
+      c.position.x += 0.01 + i*0.003;
+      if(c.position.x > 18) c.position.x = -18;
+    });
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // hide loader
+  setTimeout(()=> loaderEl.classList.add('hide'), 500);
+  setTimeout(()=>{ hintEl.style.opacity = 0; }, 9000);
+  </script>
+</body>
+</html>
