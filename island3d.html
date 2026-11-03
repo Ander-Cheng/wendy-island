@@ -262,12 +262,13 @@
     sea:0xd98a5a, reflDim:0.22
   };
   const NIGHT = {
-    bg:0x1b2246, fog:0x232a4e,
-    hemiSky:0x3a4a7a, hemiGround:0x14183a, hemiInt:0.4,
-    sunColor:0x6b7db0, sunInt:0.28, sunPos:new THREE.Vector3(-18,6,-14),
-    fillColor:0x44507e, fillInt:0.22,
-    exposure:0.9, stars:1.0,
-    sea:0x1f2b52, reflDim:0.1
+    // 月夜：提高環境光底線，避免整座島全黑（仍保留夜晚偏藍的氛圍）
+    bg:0x222a56, fog:0x2b3360,
+    hemiSky:0x5a6ba8, hemiGround:0x242a56, hemiInt:0.72,
+    sunColor:0x9fb0e0, sunInt:0.55, sunPos:new THREE.Vector3(-18,20,-14),   // 當作月光，角度拉高一點
+    fillColor:0x6a78b0, fillInt:0.42,
+    exposure:1.02, stars:1.0,
+    sea:0x273566, reflDim:0.14
   };
 
   // 星空（夜晚顯示），約 420 點
@@ -594,8 +595,9 @@
       const fr=new THREE.Mesh(new THREE.BoxGeometry(0.46,0.46,0.06),flat(0xffffff)); fr.position.set(p[0],0.75,0.79); g.add(fr);});
     // 門口小營火（好友聚會感）
     for(let i=0;i<4;i++){const log=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.5,6),flat(0x8a5a33)); log.rotation.z=Math.PI/2; log.rotation.y=i*(Math.PI/4); log.position.set(-1.3,0.08,0.9); g.add(log);}
-    const flame=new THREE.Mesh(new THREE.ConeGeometry(0.18,0.45,8),soft(0xff8c42)); flame.position.set(-1.3,0.35,0.9); g.add(flame);
-    const flame2=new THREE.Mesh(new THREE.ConeGeometry(0.1,0.28,8),soft(0xffd166)); flame2.position.set(-1.3,0.42,0.9); g.add(flame2);
+    // 營火：用自發光材質，夜晚看起來會發光
+    const flame=new THREE.Mesh(new THREE.ConeGeometry(0.18,0.45,8),new THREE.MeshStandardMaterial({color:0xff8c42,emissive:0xff6a1a,emissiveIntensity:1.2,roughness:0.6})); flame.position.set(-1.3,0.35,0.9); g.add(flame);
+    const flame2=new THREE.Mesh(new THREE.ConeGeometry(0.1,0.28,8),new THREE.MeshStandardMaterial({color:0xffd166,emissive:0xffcc55,emissiveIntensity:1.5,roughness:0.5})); flame2.position.set(-1.3,0.42,0.9); g.add(flame2);
     const sign=new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('🤝'),transparent:true})); sign.scale.set(0.9,0.9,1); sign.position.set(0,2.7,0); g.add(sign);
     return g;
   }
@@ -686,14 +688,15 @@
   const friendsIsle = registerBlockBig('friends', buildFriendHouse(),-19,  19, '好友島', 3.4, 3.0, 0xbfe3c0, 6.2);
 
   // 暖色點燈：家人島、好友島（營火旁）各放一顆節制的 PointLight（求婚/夜晚才亮）
-  function addWarmLight(wx, wz, color){
-    const pl = new THREE.PointLight(color||0xffb066, 0, 16, 2);
-    pl.position.set(wx, 4, wz);
-    pl.userData = { onInt:1.4, targetInt:0 };
+  function addWarmLight(wx, wz, color, range, onInt, y){
+    const pl = new THREE.PointLight(color||0xffb066, 0, range||16, 2);
+    pl.position.set(wx, y||4, wz);
+    pl.userData = { onInt:(onInt||1.4), targetInt:0 };
     scene.add(pl); warmLights.push(pl);
   }
-  addWarmLight(19, 19, 0xffb066);    // 家人島
-  addWarmLight(-19, 19, 0xff9a4a);   // 好友島（營火暖光）
+  addWarmLight(0, 0, 0xffc488, 26, 2.0, 6);   // 主島（整體暖光，範圍大、夜晚點亮）
+  addWarmLight(19, 19, 0xffb066, 18, 1.6);    // 家人島
+  addWarmLight(-19, 19, 0xff9a4a, 18, 1.8);   // 好友島（營火暖光，較亮）
 
   // ========================= 水面倒影（輕量：鏡像半透明代理，非 Reflector）=========================
   const seaY = sea.position.y;                     // -0.4
@@ -731,6 +734,18 @@
     seaMat.color.copy(seaCol);
     reflMat.color.copy(seaCol).lerp(new THREE.Color(0xffffff), 0.25);
     reflMat.opacity = reflDim;
+  });
+
+  // 註冊日夜回呼：暖色點燈隨「夜晚程度」自動亮起（黃昏開始漸亮、深夜最亮、白天熄滅）
+  // 求婚強制點燈時（proposeForcedDusk）交由 setWarmLights 控制，這裡不覆蓋。
+  dayNightHooks.push(()=>{
+    if(proposeForcedDusk) return;                 // 求婚點燈優先，別搶控制
+    const p = ((dayNightPhase % 1)+1)%1;
+    // 夜晚程度：phase 2/3 附近最暗（與粒子一致）；黃昏(1/3)就開始帶一點暖光
+    const nightF = Math.max(0, 1 - Math.min(Math.abs(p-2/3), Math.abs(p-2/3+1), Math.abs(p-2/3-1))*3);
+    const duskF  = Math.max(0, 1 - Math.min(Math.abs(p-1/3), Math.abs(p-1/3+1), Math.abs(p-1/3-1))*3);
+    const lightF = Math.min(1, nightF + duskF*0.35);   // 夜晚全亮，黃昏帶約三成暖意
+    warmLights.forEach(l=> l.userData.targetInt = l.userData.onInt * lightF);
   });
 
   // ========================= 粒子點綴（花瓣 / 螢火蟲 / 海面反光）=========================
