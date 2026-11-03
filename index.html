@@ -4,6 +4,18 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Wendy 島｜寶寶・我的女朋友</title>
+<!-- 預設行為：立即轉址到 3D 版（帶 ?stay=1 時才停留在 2D） -->
+<meta http-equiv="refresh" content="0; url=island3d.html" />
+<script>
+  // 若帶 ?stay=1，使用者明確要看 2D 版：移除 meta refresh、不要轉址
+  if (location.search.includes('stay=1')) {
+    var m = document.querySelector('meta[http-equiv="refresh"]');
+    if (m) m.remove();
+  } else {
+    // 雙保險：JS 立即轉址（早於 meta refresh 真正觸發）
+    location.replace('island3d.html');
+  }
+</script>
 <style>
   :root{
     --sea-deep:#2a6f97;
@@ -163,6 +175,11 @@
 <body>
 
   <a href="island3d.html" style="position:fixed;top:16px;right:16px;z-index:30;background:rgba(255,255,255,.85);color:#2a6f97;text-decoration:none;padding:9px 18px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 6px 16px rgba(42,111,151,.25)">🏝️ 進入 3D 島 →</a>
+
+  <!-- 後備連結：萬一沒自動跳轉，點這裡進入 3D -->
+  <div style="position:fixed;top:16px;left:16px;z-index:30;background:rgba(255,255,255,.9);color:#2a6f97;padding:9px 16px;border-radius:999px;font-size:.85rem;box-shadow:0 6px 16px rgba(42,111,151,.25)">
+    如果沒自動跳轉，<a href="island3d.html" style="color:#ff5d8f;font-weight:700">點這裡進入 3D →</a>
+  </div>
 
   <!-- ===== HERO ===== -->
   <header class="hero">

@@ -58,6 +58,8 @@
   #card .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   #card .chip{background:#fff0f5;color:var(--coral);padding:8px 14px;border-radius:999px;font-weight:700;font-size:.95rem}
   #card .group-title{font-weight:800;color:var(--sea-deep);margin:14px 0 6px;font-size:1.05rem}
+  #card .photo{width:100%;border-radius:16px;margin:10px 0 4px;box-shadow:0 8px 22px rgba(42,111,151,.28);border:3px solid #fff;display:block}
+  #card .photo-cap{text-align:center;color:#7a95a3;font-size:.9rem;margin-bottom:6px}
 
   /* propose card */
   #card.propose{border-color:#ff8fab;box-shadow:0 24px 70px rgba(255,93,143,.5);background:linear-gradient(180deg,#fffaf3,#fff0f5)}
@@ -74,6 +76,58 @@
     font-size:.88rem;font-weight:700;box-shadow:0 6px 16px rgba(42,111,151,.25);
   }
   #back2d:hover{background:#fff}
+
+  #dayNightBtn{
+    position:fixed;top:60px;right:18px;z-index:10;background:rgba(255,255,255,.85);
+    color:var(--sea-deep);border:none;cursor:pointer;padding:8px 16px;border-radius:999px;
+    font-size:.88rem;font-weight:700;box-shadow:0 6px 16px rgba(42,111,151,.25);
+    font-family:inherit;
+  }
+  #dayNightBtn:hover{background:#fff}
+
+  #bgmBtn{
+    position:fixed;top:102px;right:18px;z-index:10;background:rgba(255,255,255,.85);
+    color:var(--sea-deep);border:none;cursor:pointer;padding:8px 16px;border-radius:999px;
+    font-size:.88rem;font-weight:700;box-shadow:0 6px 16px rgba(42,111,151,.25);
+    font-family:inherit;
+  }
+  #bgmBtn:hover{background:#fff}
+
+  /* ---- 旅行島相簿 ---- */
+  .trip-album{padding:10px 0;border-bottom:1px dashed #ffe0ea}
+  .trip-album:last-child{border-bottom:none}
+  .trip-head{font-size:1.1rem;color:var(--sea-deep)}
+  .trip-head .trip-flag{font-size:1.4rem;margin-right:6px}
+  .trip-note{color:#6b7b86;line-height:1.7;margin:4px 0 8px}
+  .thumbs{display:flex;flex-wrap:wrap;gap:8px}
+  .thumb{width:84px;height:84px;object-fit:cover;border-radius:12px;border:3px solid #fff;
+    box-shadow:0 6px 16px rgba(42,111,151,.22);cursor:pointer;transition:transform .2s}
+  .thumb:hover{transform:scale(1.06)}
+  .photo-ph{background:#fff0f5;color:#b58aa0;border-radius:12px;padding:16px;text-align:center;font-size:.92rem}
+  #card .photo{cursor:zoom-in}
+
+  /* ---- 照片燈箱 Lightbox ---- */
+  #lightbox{
+    position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+    background:rgba(20,28,38,.82);opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  #lightbox.show{opacity:1;pointer-events:auto}
+  #lightbox img{
+    max-width:88vw;max-height:80vh;border-radius:18px;border:4px solid #fff;
+    box-shadow:0 24px 70px rgba(0,0,0,.5);background:#fff;
+  }
+  #lightbox .lb-close{position:absolute;top:18px;right:22px;font-size:34px;line-height:1;color:#fff;
+    background:none;border:none;cursor:pointer;opacity:.85}
+  #lightbox .lb-close:hover{opacity:1}
+  #lightbox .lb-nav{position:absolute;top:50%;transform:translateY(-50%);font-size:40px;line-height:1;
+    color:#fff;background:rgba(255,255,255,.18);border:none;cursor:pointer;width:54px;height:54px;
+    border-radius:50%;opacity:.9;user-select:none}
+  #lightbox .lb-nav:hover{background:rgba(255,255,255,.3)}
+  #lightbox .lb-nav[disabled]{opacity:.25;cursor:default}
+  #lightbox .lb-prev{left:16px}
+  #lightbox .lb-next{right:16px}
+  #lightbox .lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+    color:#fff;background:rgba(0,0,0,.4);padding:6px 16px;border-radius:999px;font-size:.9rem;font-weight:700}
 </style>
 </head>
 <body>
@@ -89,9 +143,11 @@
     <p>暱稱 <b>寶寶</b> ・ 我的女朋友 ・ <b>讓人又愛又恨</b> 😤❤️</p>
   </div>
 
-  <a id="back2d" href="index.html">← 2D 版</a>
+  <a id="back2d" href="index.html?stay=1">← 2D 版</a>
+  <button id="dayNightBtn" title="切換日夜模式">🔄 自動</button>
+  <button id="bgmBtn" title="背景音樂開關">🔇 音樂</button>
 
-  <div id="hint">🖱️ 拖曳旋轉 ・ 滾輪縮放 ・ 點島上的人物與周邊小島，認識 Wendy 這個人</div>
+  <div id="hint">🖱️ 拖曳旋轉 ・ 滾輪縮放 ・ 點島上的人物與周邊小島，認識 Wendy 這個人　🌗 右上可切換白天／黃昏／夜晚</div>
 
   <div id="card">
     <button class="close" aria-label="close">×</button>
@@ -99,6 +155,18 @@
     <h2 id="card-title">標題</h2>
     <div class="body" id="card-body"></div>
   </div>
+
+  <!-- 照片燈箱（通用元件，家人/好友/求婚/旅行島共用） -->
+  <div id="lightbox" aria-hidden="true">
+    <button class="lb-close" aria-label="關閉">×</button>
+    <button class="lb-nav lb-prev" aria-label="上一張">‹</button>
+    <img id="lb-img" src="" alt="">
+    <button class="lb-nav lb-next" aria-label="下一張">›</button>
+    <div class="lb-count" id="lb-count"></div>
+  </div>
+
+  <!-- 資料外置：classic script，確保早於 module 執行，window.ISLAND_DATA 可用 -->
+  <script src="data.js"></script>
 
   <script type="importmap">
   {
@@ -115,6 +183,15 @@
 
   const loaderEl = document.getElementById('loader');
   const hintEl = document.getElementById('hint');
+
+  // ========================= 外置資料（data.js）防呆讀取 =========================
+  const D = window.ISLAND_DATA || {};
+  const animalsData = Array.isArray(D.animals) ? D.animals : [];
+  const familyData  = Array.isArray(D.family)  ? D.family  : [];
+  const friendsData = Array.isArray(D.friends) ? D.friends : [];
+  const tripsData   = Array.isArray(D.trips)   ? D.trips   : [];
+  const photosData  = D.photos || {};
+  const audioData   = D.audio  || {};
 
   // ========================= scene =========================
   const scene = new THREE.Scene();
@@ -149,7 +226,8 @@
   controls.autoRotateSpeed = 0.5;
 
   // ========================= lights =========================
-  scene.add(new THREE.HemisphereLight(0xfff4e6, 0x9ad0e5, 0.85));
+  const hemi = new THREE.HemisphereLight(0xfff4e6, 0x9ad0e5, 0.85);
+  scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xfff0d8, 1.15);
   sun.position.set(18, 28, 16);
   sun.castShadow = true;
@@ -164,6 +242,141 @@
   const fill = new THREE.DirectionalLight(0xbfe0ff, 0.35);
   fill.position.set(-16, 12, -14);
   scene.add(fill);
+
+  // ========================= 日夜循環系統 =========================
+  // 三個 preset：白天（現況藍天）／黃昏（橘粉金、低太陽長影）／夜晚（深藍紫、星空、弱光）
+  const DAY = {
+    bg:0xbfe9f5, fog:0xbfe9f5,
+    hemiSky:0xfff4e6, hemiGround:0x9ad0e5, hemiInt:0.85,
+    sunColor:0xfff0d8, sunInt:1.15, sunPos:new THREE.Vector3(18,28,16),
+    fillColor:0xbfe0ff, fillInt:0.35,
+    exposure:1.05, stars:0.0,
+    sea:0x4ba3c7, reflDim:0.18
+  };
+  const DUSK = {
+    bg:0xffb27a, fog:0xffa06b,
+    hemiSky:0xffd9a0, hemiGround:0xb08a6a, hemiInt:0.7,
+    sunColor:0xff8a4c, sunInt:1.0, sunPos:new THREE.Vector3(26,8,10),
+    fillColor:0xffb27a, fillInt:0.4,
+    exposure:1.1, stars:0.15,
+    sea:0xd98a5a, reflDim:0.22
+  };
+  const NIGHT = {
+    bg:0x1b2246, fog:0x232a4e,
+    hemiSky:0x3a4a7a, hemiGround:0x14183a, hemiInt:0.4,
+    sunColor:0x6b7db0, sunInt:0.28, sunPos:new THREE.Vector3(-18,6,-14),
+    fillColor:0x44507e, fillInt:0.22,
+    exposure:0.9, stars:1.0,
+    sea:0x1f2b52, reflDim:0.1
+  };
+
+  // 星空（夜晚顯示），約 420 點
+  let starPoints;
+  (function buildStars(){
+    const N=420, arr=new Float32Array(N*3);
+    for(let i=0;i<N;i++){
+      // 分佈於天空半球外圈
+      const r=120+Math.random()*60;
+      const theta=Math.random()*Math.PI*2;
+      const phi=Math.random()*Math.PI*0.5;          // 上半球
+      arr[i*3]   = Math.cos(theta)*Math.sin(phi)*r;
+      arr[i*3+1] = Math.cos(phi)*r*0.9 + 10;
+      arr[i*3+2] = Math.sin(theta)*Math.sin(phi)*r;
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(arr,3));
+    const mat=new THREE.PointsMaterial({ color:0xfffbe0, size:1.4, sizeAttenuation:false,
+      transparent:true, opacity:0, depthWrite:false });
+    starPoints=new THREE.Points(geo,mat);
+    starPoints.renderOrder=-1;
+    scene.add(starPoints);
+  })();
+
+  const _cA=new THREE.Color(), _cB=new THREE.Color();
+  function lerpColorHex(a,b,k,out){ _cA.setHex(a); _cB.setHex(b); out.copy(_cA).lerp(_cB,k); }
+  const _lerp=(a,b,k)=>a+(b-a)*k;
+
+  // reflection / sea 回呼（由第 5 項倒影系統註冊）
+  let dayNightHooks = [];
+
+  function applyPreset(a, b, k){
+    lerpColorHex(a.bg, b.bg, k, scene.background);
+    if(scene.fog) lerpColorHex(a.fog, b.fog, k, scene.fog.color);
+    lerpColorHex(a.hemiSky, b.hemiSky, k, hemi.color);
+    lerpColorHex(a.hemiGround, b.hemiGround, k, hemi.groundColor);
+    hemi.intensity = _lerp(a.hemiInt, b.hemiInt, k);
+    lerpColorHex(a.sunColor, b.sunColor, k, sun.color);
+    sun.intensity = _lerp(a.sunInt, b.sunInt, k);
+    sun.position.lerpVectors(a.sunPos, b.sunPos, k);
+    lerpColorHex(a.fillColor, b.fillColor, k, fill.color);
+    fill.intensity = _lerp(a.fillInt, b.fillInt, k);
+    renderer.toneMappingExposure = _lerp(a.exposure, b.exposure, k);
+    if(starPoints) starPoints.material.opacity = _lerp(a.stars, b.stars, k);
+    const seaCol = _cA.clone(); lerpColorHex(a.sea, b.sea, k, seaCol);
+    const reflDim = _lerp(a.reflDim, b.reflDim, k);
+    dayNightHooks.forEach(fn => fn(seaCol, reflDim, k, a, b));
+  }
+
+  // 由 phase(0..1) 計算目前日夜狀態並套用
+  //  0.00..0.33 日→黃昏；0.33..0.66 黃昏→夜；0.66..1 夜→日
+  function applyDayNightPhase(phase){
+    const p = ((phase % 1) + 1) % 1;
+    if(p < 1/3)      applyPreset(DAY,  DUSK,  p/(1/3));
+    else if(p < 2/3) applyPreset(DUSK, NIGHT, (p-1/3)/(1/3));
+    else             applyPreset(NIGHT,DAY,   (p-2/3)/(1/3));
+  }
+
+  // 日夜狀態
+  const DN_CYCLE = 150;              // 一圈約 2.5 分鐘
+  let dayNightPhase = 0;             // 從白天開始
+  let dnAuto = true;                 // 自動循環
+  let dnTween = null;                // 平滑過渡 {from,to,t,dur,after}
+  // 手動模式輪替：自動 → 白天 → 黃昏 → 夜晚 → 自動
+  const DN_MODES = [
+    { label:'🔄 自動', auto:true,  phase:null },
+    { label:'☀️ 白天', auto:false, phase:0.0 },
+    { label:'🌇 黃昏', auto:false, phase:1/3 },
+    { label:'🌙 夜晚', auto:false, phase:2/3 }
+  ];
+  let dnModeIdx = 0;
+  const dayNightBtn = document.getElementById('dayNightBtn');
+  function startDnTween(toPhase, dur, after){
+    dnTween = { from:dayNightPhase, to:toPhase, t:0, dur:dur||1.2, after:after||null };
+  }
+  dayNightBtn.addEventListener('click', ()=>{
+    dnModeIdx = (dnModeIdx + 1) % DN_MODES.length;
+    const m = DN_MODES[dnModeIdx];
+    dayNightBtn.textContent = m.label;
+    dnAuto = m.auto;
+    if(!m.auto) startDnTween(m.phase, 1.0);
+  });
+
+  // 求婚聯動：強制平滑切到黃昏 + 點燈；關卡未答應再還原
+  let proposeForcedDusk = false;
+  let dnSaved = null;
+  function forceDuskForPropose(){
+    if(!proposeForcedDusk){
+      dnSaved = { phase:dayNightPhase, auto:dnAuto, modeIdx:dnModeIdx };
+    }
+    proposeForcedDusk = true;
+    dnAuto = false;
+    setWarmLights(true);
+    startDnTween(1/3, 1.6);          // 平滑切到黃昏
+  }
+  function restoreDayNightAfterPropose(){
+    if(!proposeForcedDusk) return;
+    proposeForcedDusk = false;
+    setWarmLights(false);
+    if(dnSaved){
+      dnAuto = dnSaved.auto; dnModeIdx = dnSaved.modeIdx;
+      dayNightBtn.textContent = DN_MODES[dnModeIdx].label;
+      startDnTween(dnSaved.phase, 1.6);
+    }
+    dnSaved = null;
+  }
+  // 暖色點燈（家人島/好友島/營火）—— 物件於下方倒影/島嶼建立後註冊
+  const warmLights = [];
+  function setWarmLights(on){ warmLights.forEach(l=> l.userData.targetInt = on ? l.userData.onInt : 0); }
 
   // flat-shaded material (low-poly facets) — keep for terrain/foliage
   const flat = (c) => new THREE.MeshStandardMaterial({ color:c, flatShading:true, roughness:.9, metalness:0 });
@@ -369,6 +582,23 @@
     const heart=new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('👨‍👩‍👧‍👦'),transparent:true})); heart.scale.set(0.9,0.9,1); heart.position.set(0,2.7,0); g.add(heart);
     return g;
   }
+  // 好友島地標：營火小屋（跟家人島的房子區隔風格）
+  function buildFriendHouse(){
+    const g = new THREE.Group();
+    const base=new THREE.Mesh(new THREE.BoxGeometry(1.8,1.2,1.6),flat(0xe9f5e6)); base.position.y=0.6; base.castShadow=true; g.add(base);
+    const roof=new THREE.Mesh(new THREE.ConeGeometry(1.5,1,4),flat(0x8ccf8a)); roof.position.y=1.7; roof.rotation.y=Math.PI/4; roof.castShadow=true; g.add(roof);
+    const roofTrim=new THREE.Mesh(new THREE.TorusGeometry(1.0,0.06,6,4),flat(0x5fae5a)); roofTrim.rotation.x=Math.PI/2; roofTrim.rotation.z=Math.PI/4; roofTrim.position.y=1.22; g.add(roofTrim);
+    const door=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.8,0.1),flat(0x9c6b43)); door.position.set(0,0.4,0.82); g.add(door);
+    const knob=new THREE.Mesh(new THREE.SphereGeometry(0.05,8,8),soft(0xffd166)); knob.position.set(0.15,0.4,0.88); g.add(knob);
+    [[-0.55],[0.55]].forEach(p=>{const w=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.4,0.08),flat(0xa9e6f0)); w.position.set(p[0],0.75,0.84); g.add(w);
+      const fr=new THREE.Mesh(new THREE.BoxGeometry(0.46,0.46,0.06),flat(0xffffff)); fr.position.set(p[0],0.75,0.79); g.add(fr);});
+    // 門口小營火（好友聚會感）
+    for(let i=0;i<4;i++){const log=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.5,6),flat(0x8a5a33)); log.rotation.z=Math.PI/2; log.rotation.y=i*(Math.PI/4); log.position.set(-1.3,0.08,0.9); g.add(log);}
+    const flame=new THREE.Mesh(new THREE.ConeGeometry(0.18,0.45,8),soft(0xff8c42)); flame.position.set(-1.3,0.35,0.9); g.add(flame);
+    const flame2=new THREE.Mesh(new THREE.ConeGeometry(0.1,0.28,8),soft(0xffd166)); flame2.position.set(-1.3,0.42,0.9); g.add(flame2);
+    const sign=new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex('🤝'),transparent:true})); sign.scale.set(0.9,0.9,1); sign.position.set(0,2.7,0); g.add(sign);
+    return g;
+  }
 
   // ========================= satellite islands + bridges =========================
   const satellites = [];
@@ -451,52 +681,161 @@
   registerBlock('zoo',         buildZoo(),         17,   0, '動物島', 3.0, 2.4, 0xffe08a);
   registerBlock('trips',       buildPlane(),        0,  17, '旅行島', 2.6, 2.2, 0xa9e6f0);
   registerBlock('journey',     buildMilestone(),  -17,   0, '人生島', 3.1, 2.6, 0xc4f0d8);
-  // 親友島放遠一點、島做大一點，才放得下一群小人
-  const familyIsle = registerBlockBig('family', buildFamilyHouse(), 19, 19, '親友島', 3.4, 3.0, 0xffd6a5, 6.2);
+  // 家人島 & 好友島：各放遠一點、島做大一點，才放得下一群小人
+  const familyIsle  = registerBlockBig('family',  buildFamilyHouse(), 19,  19, '家人島', 3.4, 3.0, 0xffd6a5, 6.2);
+  const friendsIsle = registerBlockBig('friends', buildFriendHouse(),-19,  19, '好友島', 3.4, 3.0, 0xbfe3c0, 6.2);
 
-  // ========================= card data =========================
-  const DATA = {
-    personality: { ic:'✨', title:'她是怎樣的人', html:`
-      <div class="row"><div class="k">🎀</div><div class="v"><b>可愛</b><br>一舉一動都讓人融化，笑起來能照亮整座島。</div></div>
-      <div class="row"><div class="k">🤲</div><div class="v"><b>貼心</b><br>總是先想到別人，默默把溫暖準備好。</div></div>
-      <div class="row"><div class="k">💪</div><div class="v"><b>勤奮</b><br>認真又努力，設定目標就穩穩前進，超可靠。</div></div>` },
-    zoo: { ic:'🐾', title:'可愛動物園', html:`<div class="chips">
-      <span class="chip">🐱 貓</span><span class="chip">🐶 狗</span><span class="chip">🐢 烏龜</span>
-      <span class="chip">🐴 小馬</span><span class="chip">🐑 羊</span><span class="chip">🦎 變色龍</span>
-      </div><p style="text-align:center;margin-top:14px;color:#7a95a3">寶寶最愛的毛茸茸朋友們 💕</p>` },
-    trips: { ic:'✈️', title:'一起走過的旅行足跡', html:`
-      <div class="row"><div class="k">🇻🇳</div><div class="v"><b>富國島</b>　陽光、海灘與椰林</div></div>
-      <div class="row"><div class="k">🗼</div><div class="v"><b>東京</b>　繁華又浪漫的日本</div></div>
-      <div class="row"><div class="k">🌺</div><div class="v"><b>沖繩</b>　碧海藍天的度假島</div></div>
-      <div class="row"><div class="k">🇰🇷</div><div class="v"><b>釜山</b>　海港城市的悠閒</div></div>
-      <div class="row"><div class="k">🏔️</div><div class="v"><b>湯澤</b>　雪國溫泉的浪漫</div></div>` },
-    journey: { ic:'🗺️', title:'她的人生航線', html:`
-      <div class="row"><div class="k">👶</div><div class="v"><b>1994</b>　寶寶降臨世界，故事的起點。</div></div>
-      <div class="row"><div class="k">🎓</div><div class="v"><b>2016</b>　文化大學畢業，帶著夢想出發。</div></div>
-      <div class="row"><div class="k">🛋️</div><div class="v"><b>2019</b>　在 Crate &amp; Barrel 相遇。</div></div>
-      <div class="row"><div class="k">💑</div><div class="v"><b>2023</b>　正式在一起，島上有了我們。</div></div>` },
-    family: { ic:'👨‍👩‍👧‍👦', title:'我們的親友島', html:`
-      <div class="group-title">💖 Wendy 的家人</div>
-      <div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>
-      <div class="row"><div class="k">👩</div><div class="v"><b>媽媽</b></div></div>
-      <div class="row"><div class="k">👧</div><div class="v"><b>Jacky</b>　姐姐</div></div>
-      <div class="row"><div class="k">🧒</div><div class="v"><b>Summer</b>　姪女</div></div>
-      <div class="group-title">💙 我的家人</div>
-      <div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>
-      <div class="row"><div class="k">👩</div><div class="v"><b>媽媽</b></div></div>
-      <div class="row"><div class="k">👧</div><div class="v"><b>姐姐</b></div></div>
-      <div class="row"><div class="k">🤵</div><div class="v"><b>姊夫</b></div></div>
-      <div class="row"><div class="k">👭</div><div class="v"><b>兩個姪女</b></div></div>` },
-    propose: { ic:'💍', title:'Will you marry me?', html:`
-      <p style="text-align:center;color:#6b7b86;line-height:1.9;margin-bottom:6px">
-        親愛的寶寶，謝謝妳走進我的世界，成為這座島的名字。<br>
-        從 Crate &amp; Barrel 的相遇，到現在的每一天，<br>
-        我想把剩下的人生，都留在這座島上陪妳。</p>
-      <div id="propose-actions" style="text-align:center;margin-top:18px">
-        <button id="yesBtn">Yes, I do 💍</button></div>
-      <p id="propose-answer" style="display:none;text-align:center;margin-top:16px;font-size:1.3rem;color:#ff5d8f;font-weight:800;line-height:1.7">
-        💍 她戴上了戒指！<br>從今天起，Wendy 島永遠有我們兩個人 💑</p>` }
-  };
+  // 暖色點燈：家人島、好友島（營火旁）各放一顆節制的 PointLight（求婚/夜晚才亮）
+  function addWarmLight(wx, wz, color){
+    const pl = new THREE.PointLight(color||0xffb066, 0, 16, 2);
+    pl.position.set(wx, 4, wz);
+    pl.userData = { onInt:1.4, targetInt:0 };
+    scene.add(pl); warmLights.push(pl);
+  }
+  addWarmLight(19, 19, 0xffb066);    // 家人島
+  addWarmLight(-19, 19, 0xff9a4a);   // 好友島（營火暖光）
+
+  // ========================= 水面倒影（輕量：鏡像半透明代理，非 Reflector）=========================
+  const seaY = sea.position.y;                     // -0.4
+  const reflMat = new THREE.MeshBasicMaterial({
+    color:0x6fb6d0, transparent:true, opacity:0.18, depthWrite:false, side:THREE.DoubleSide
+  });
+  const reflGroup = new THREE.Group();
+  scene.add(reflGroup);
+  // 主島輪廓倒影（用簡化錐體近似，省效能）
+  function addReflBlob(x, z, r, h){
+    const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 8), reflMat);
+    // 鏡像：尖端朝下（scale.y=-1 的效果），放在海面下
+    m.position.set(x, seaY - h*0.5, z);
+    m.rotation.x = Math.PI;                         // 錐尖朝下
+    reflGroup.add(m);
+  }
+  addReflBlob(0, 0, 9, 5);                          // 主島
+  addReflBlob(0, -17, 3.5, 3);                      // 個性島
+  addReflBlob(17, 0, 3.2, 3);                       // 動物島
+  addReflBlob(0, 17, 2.8, 3);                       // 旅行島
+  addReflBlob(-17, 0, 3.4, 3);                      // 人生島
+  addReflBlob(19, 19, 4.5, 3.5);                    // 家人島
+  addReflBlob(-19, 19, 4.5, 3.5);                   // 好友島
+  // 雲的倒影（跟著雲 x 移動）
+  const cloudRefls = [];
+  clouds.forEach(c=>{
+    const m = new THREE.Mesh(new THREE.SphereGeometry(1.6, 10, 8), reflMat);
+    m.scale.set(1.6, 0.5, 1.2);
+    m.position.set(c.position.x, seaY + 0.05, c.position.z);
+    reflGroup.add(m); cloudRefls.push({ mesh:m, cloud:c });
+  });
+
+  // 註冊日夜回呼：海面顏色 + 倒影色調/強度隨日夜變化
+  dayNightHooks.push((seaCol, reflDim)=>{
+    seaMat.color.copy(seaCol);
+    reflMat.color.copy(seaCol).lerp(new THREE.Color(0xffffff), 0.25);
+    reflMat.opacity = reflDim;
+  });
+
+  // ========================= 粒子點綴（花瓣 / 螢火蟲 / 海面反光）=========================
+  // 花瓣：白天/黃昏緩降搖擺（夜晚隱藏）
+  const PETAL_N = 50;
+  const petalGeo = new THREE.BufferGeometry();
+  const petalPos = new Float32Array(PETAL_N*3);
+  const petalData = [];
+  for(let i=0;i<PETAL_N;i++){
+    const x=(Math.random()-0.5)*60, y=4+Math.random()*18, z=(Math.random()-0.5)*60;
+    petalPos[i*3]=x; petalPos[i*3+1]=y; petalPos[i*3+2]=z;
+    petalData.push({ swing:Math.random()*Math.PI*2, swAmp:0.6+Math.random()*0.8,
+      fall:0.6+Math.random()*0.7, baseX:x });
+  }
+  petalGeo.setAttribute('position', new THREE.BufferAttribute(petalPos,3));
+  const petalMat = new THREE.PointsMaterial({ color:0xffd0e0, size:0.6, transparent:true,
+    opacity:0.9, depthWrite:false });
+  const petals = new THREE.Points(petalGeo, petalMat);
+  scene.add(petals);
+
+  // 螢火蟲：只在夜晚出現，島周圍緩慢遊走 + 明滅
+  const FLY_N = 40;
+  const flyGeo = new THREE.BufferGeometry();
+  const flyPos = new Float32Array(FLY_N*3);
+  const flyData = [];
+  for(let i=0;i<FLY_N;i++){
+    const a=Math.random()*Math.PI*2, r=5+Math.random()*16;
+    const x=Math.cos(a)*r, z=Math.sin(a)*r, y=1.5+Math.random()*4;
+    flyPos[i*3]=x; flyPos[i*3+1]=y; flyPos[i*3+2]=z;
+    flyData.push({ cx:x, cz:z, cy:y, phase:Math.random()*Math.PI*2,
+      freq:0.8+Math.random()*1.4, drift:Math.random()*Math.PI*2, dr:1+Math.random()*2 });
+  }
+  flyGeo.setAttribute('position', new THREE.BufferAttribute(flyPos,3));
+  const flyMat = new THREE.PointsMaterial({ color:0xd8ff88, size:0.9, transparent:true,
+    opacity:0, depthWrite:false, blending:THREE.AdditiveBlending });
+  const fireflies = new THREE.Points(flyGeo, flyMat);
+  scene.add(fireflies);
+
+  // 海面反光：貼近海面的隨機閃爍亮點
+  const SPARK_N = 44;
+  const sparkGeo = new THREE.BufferGeometry();
+  const sparkPos = new Float32Array(SPARK_N*3);
+  const sparkData = [];
+  for(let i=0;i<SPARK_N;i++){
+    const x=(Math.random()-0.5)*90, z=(Math.random()-0.5)*90;
+    sparkPos[i*3]=x; sparkPos[i*3+1]=seaY+0.25; sparkPos[i*3+2]=z;
+    sparkData.push({ phase:Math.random()*Math.PI*2, freq:1.5+Math.random()*2.5 });
+  }
+  sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos,3));
+  const sparkMat = new THREE.PointsMaterial({ color:0xffffff, size:0.7, transparent:true,
+    opacity:0.6, depthWrite:false, blending:THREE.AdditiveBlending });
+  const sparks = new THREE.Points(sparkGeo, sparkMat);
+  scene.add(sparks);
+
+  // 日夜回呼：粒子顯隱與顏色。dayFactor=白天強度, nightFactor=夜晚強度
+  dayNightHooks.push((seaCol, reflDim)=>{
+    const p = ((dayNightPhase % 1)+1)%1;
+    // 夜晚程度：phase 約在 2/3 附近最暗
+    const nightF = Math.max(0, 1 - Math.min(Math.abs(p-2/3), Math.abs(p-2/3+1), Math.abs(p-2/3-1))*3);
+    const dayF = 1 - nightF;
+    petalMat.opacity = 0.9 * dayF;            // 花瓣白天/黃昏可見
+    flyMat.opacity   = 0.9 * nightF;          // 螢火蟲夜晚可見
+    // 海面反光顏色隨日夜
+    sparkMat.color.copy(seaCol).lerp(new THREE.Color(0xffffff), 0.6);
+    sparkMat.opacity = 0.3 + 0.45*dayF;
+  });
+
+  // ========================= card data（讀自 data.js，缺資料時防呆）=========================
+  const DATA = D.cards || {};
+
+  // 動物島 chips 由 animals 動態生成（新增動物只需改 data.js）
+  function buildZooHtml(){
+    const chips = animalsData.map(a =>
+      `<span class="chip">${a.chipEmoji||'🐾'} ${a.chipName||''}</span>`).join('');
+    const footer = (DATA.zoo && DATA.zoo.footer) ||
+      '<p style="text-align:center;margin-top:14px;color:#7a95a3">寶寶最愛的毛茸茸朋友們 💕</p>';
+    return `<div class="chips">${chips}</div>${footer}`;
+  }
+
+  // 旅行島相簿由 trips 動態生成（每地點：標題 + 回憶短文 + 縮圖；photos 為空顯示佔位）
+  function buildTripsHtml(){
+    if(!tripsData.length){
+      return '<p style="text-align:center;color:#7a95a3">旅行足跡整理中 ✈️</p>';
+    }
+    return tripsData.map((t, ti) => {
+      const flag = t.flag || '✈️';
+      const name = t.name || '';
+      const note = t.note || '';
+      const photos = Array.isArray(t.photos) ? t.photos : [];
+      let media;
+      if(photos.length){
+        // 縮圖列：點縮圖以 Lightbox 開啟該地點相簿（data-trip 索引 + data-idx 照片索引）
+        media = `<div class="thumbs">` + photos.map((src, pi) =>
+          `<img class="thumb" src="${src}" alt="${name}" loading="lazy" data-trip="${ti}" data-idx="${pi}">`
+        ).join('') + `</div>`;
+      } else {
+        media = `<div class="photo-ph">照片整理中…</div>`;
+      }
+      return `<div class="trip-album">
+        <div class="trip-head"><span class="trip-flag">${flag}</span><b>${name}</b></div>
+        <div class="trip-note">${note}</div>
+        ${media}
+      </div>`;
+    }).join('');
+  }
 
   // ========================= residents (critters) =========================
   const residents = [];
@@ -584,20 +923,44 @@
     const tail=new THREE.Mesh(new THREE.TorusGeometry(0.26,0.07,8,14,Math.PI*1.6),soft(0x80ed99)); tail.position.set(0,0.52,-0.7); tail.rotation.y=Math.PI/2; g.add(tail);
     const legGeo=new THREE.CapsuleGeometry(0.06,0.2,4,6),legMat=soft(0x57cc99);
     [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat); l.position.set(p[0]*0.3,0.2,p[1]*0.4); g.add(l);}); return g; }
+  function buildMouse(){ const g=new THREE.Group(); const col=0xb9b2ba, inner=0xffc2d1;
+    // rounded body
+    const body=new THREE.Mesh(new THREE.SphereGeometry(0.4,14,12),soft(col)); body.scale.set(1,0.85,1.3); body.position.y=0.5; body.castShadow=true; g.add(body);
+    // head (slightly pointed snout via scaled sphere)
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.3,14,12),soft(col)); head.scale.set(1,0.95,1.1); head.position.set(0,0.62,0.55); head.castShadow=true; g.add(head);
+    const snout=new THREE.Mesh(new THREE.SphereGeometry(0.14,10,10),soft(col)); snout.scale.set(0.9,0.8,1.2); snout.position.set(0,0.54,0.82); g.add(snout);
+    const nose=new THREE.Mesh(new THREE.SphereGeometry(0.06,8,8),soft(0xff6b8a)); nose.position.set(0,0.54,0.97); g.add(nose);
+    // big round ears
+    [[-0.22],[0.22]].forEach(e=>{const ear=new THREE.Mesh(new THREE.SphereGeometry(0.2,12,12),soft(col)); ear.scale.set(1,1,0.4); ear.position.set(e[0],0.92,0.46); g.add(ear);
+      const ini=new THREE.Mesh(new THREE.SphereGeometry(0.12,10,10),soft(inner)); ini.scale.set(1,1,0.4); ini.position.set(e[0],0.92,0.52); g.add(ini);});
+    // eyes with highlight
+    [[-0.12],[0.12]].forEach(p=>{const e=eyeBall(0.06); e.position.set(p[0],0.66,0.82); g.add(e);});
+    // whiskers
+    [[-1,0.08],[-1,-0.02],[1,0.08],[1,-0.02]].forEach(w=>{const wk=new THREE.Mesh(new THREE.CylinderGeometry(0.008,0.008,0.3,4),soft(0x6b6470)); wk.rotation.z=Math.PI/2; wk.position.set(w[0]*0.22,0.54+w[1],0.85); wk.rotation.y=w[0]*0.3; g.add(wk);});
+    // little legs
+    const legGeo=new THREE.CapsuleGeometry(0.07,0.14,4,6),legMat=soft(col);
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{const l=new THREE.Mesh(legGeo,legMat); l.position.set(p[0]*0.26,0.16,p[1]*0.32); g.add(l);});
+    // long curly tail
+    const tail=new THREE.Mesh(new THREE.TorusGeometry(0.28,0.045,8,16,Math.PI*1.4),soft(0xd8a7b0)); tail.position.set(0,0.5,-0.7); tail.rotation.set(Math.PI/2,0,0.4); g.add(tail);
+    return g; }
 
-  critter(buildCat,      -3,   3,  '喵～最愛寶寶');
-  critter(buildDog,       5,  -1,  '汪！忠心陪伴');
-  critter(buildTurtle,    2.5, 3.5,'慢慢來，有我在');
-  critter(buildPony,     -5.5,-1,  '帶你去冒險');
-  critter(buildSheep,     0,   5,  '咩～軟綿綿抱抱');
-  critter(buildChameleon,-1.5, 2,  '我會為你變色');
+  // 動物居民：依 data.js 的 animals 讀資料生成（未知 key 跳過，不崩潰）
+  const CRITTER_BUILDERS = {
+    cat: buildCat, dog: buildDog, turtle: buildTurtle, pony: buildPony,
+    sheep: buildSheep, chameleon: buildChameleon, mouse: buildMouse
+  };
+  animalsData.forEach(a => {
+    const b = CRITTER_BUILDERS[a.key];
+    if(b) critter(b, a.x, a.z, a.say || '');
+  });
 
   // ========================= star residents: Wendy + Me =========================
   // --- Wendy (bride) ---
   let wendy, wendyRing;
   (function buildWendy(){
     const g = new THREE.Group();
-    const skin=0xffe0bd, hair=0x5b3a29, dress=0xff8fab;
+    // 依「我們.JPG」調整：長直黑髮、膚色偏白、露齒笑
+    const skin=0xfbe4cf, hair=0x1c1410, dress=0xff8fab;
     // dress: skirt cone + rounded bodice
     const skirt=new THREE.Mesh(new THREE.ConeGeometry(0.9,1.4,16),soft(dress)); skirt.position.y=0.7; skirt.castShadow=true; g.add(skirt);
     const bodice=new THREE.Mesh(new THREE.SphereGeometry(0.42,14,12),soft(dress)); bodice.scale.set(1,1.1,0.9); bodice.position.y=1.55; bodice.castShadow=true; g.add(bodice);
@@ -608,16 +971,20 @@
     const head=new THREE.Mesh(new THREE.SphereGeometry(0.52,16,16),soft(skin)); head.scale.set(1,1.08,1); head.position.y=2.25; head.castShadow=true; g.add(head);
     // hair
     const hairBack=new THREE.Mesh(new THREE.SphereGeometry(0.58,16,16),soft(hair)); hairBack.position.set(0,2.3,-0.06); hairBack.scale.set(1.05,1.12,1); g.add(hairBack);
-    const fringe=new THREE.Mesh(new THREE.SphereGeometry(0.56,16,16,0,Math.PI*2,0,Math.PI/2.3),soft(hair)); fringe.position.set(0,2.45,0.02); g.add(fringe);
-    [[-0.55],[0.55]].forEach(p=>{const pt=new THREE.Mesh(new THREE.CapsuleGeometry(0.18,0.5,6,10),soft(hair)); pt.position.set(p[0],2.0,-0.12); g.add(pt);
-      const tie=new THREE.Mesh(new THREE.TorusGeometry(0.1,0.04,6,12),soft(0xff4778)); tie.position.set(p[0],2.28,-0.08); tie.rotation.y=Math.PI/2; g.add(tie);});
+    // 瀏海（齊瀏海，照片為黑色長直髮配瀏海）
+    const fringe=new THREE.Mesh(new THREE.SphereGeometry(0.56,16,16,0,Math.PI*2,0,Math.PI/2.3),soft(hair)); fringe.position.set(0,2.45,0.04); fringe.scale.set(1.04,0.9,1.02); g.add(fringe);
+    // 長直髮：兩側各一束順肩垂下（取代原本的雙馬尾）
+    [[-0.5],[0.5]].forEach(p=>{const strand=new THREE.Mesh(new THREE.CapsuleGeometry(0.2,1.15,8,12),soft(hair)); strand.position.set(p[0],1.45,-0.02); strand.scale.set(0.9,1,0.75); g.add(strand);});
+    // 後方長直髮（背面長度）
+    const hairLong=new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.1,10,16),soft(hair)); hairLong.position.set(0,1.5,-0.32); hairLong.scale.set(1.1,1,0.55); g.add(hairLong);
     // eyes with highlight + lash
     [[-0.19],[0.19]].forEach(p=>{const e=eyeBall(0.085); e.position.set(p[0],2.27,0.46); g.add(e);
       const lash=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.03,0.02),soft(0x2b2d42)); lash.position.set(p[0],2.37,0.47); lash.rotation.z=p[0]>0?-0.2:0.2; g.add(lash);});
     // blush
     [[-0.3],[0.3]].forEach(p=>{const b=new THREE.Mesh(new THREE.SphereGeometry(0.1,10,10),soft(0xff9ab0)); b.position.set(p[0],2.12,0.42); b.scale.set(1,0.6,0.4); g.add(b);});
-    // smile (thin torus arc)
-    const smile=new THREE.Mesh(new THREE.TorusGeometry(0.1,0.02,6,12,Math.PI),soft(0xd4537a)); smile.position.set(0,2.08,0.5); smile.rotation.z=Math.PI; g.add(smile);
+    // 露齒笑：張口弧 + 白色牙齒條（照片是燦爛露齒笑）
+    const mouth=new THREE.Mesh(new THREE.SphereGeometry(0.12,12,10,0,Math.PI*2,Math.PI/2,Math.PI/2),soft(0xc23a5e)); mouth.scale.set(1.3,0.8,0.5); mouth.position.set(0,2.04,0.48); g.add(mouth);
+    const teeth=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.07,0.04),soft(0xfffdf7)); teeth.position.set(0,2.08,0.52); g.add(teeth);
     // veil behind head
     const veil=new THREE.Mesh(new THREE.ConeGeometry(0.55,1.2,16,1,true),new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:0.5,roughness:0.6,side:THREE.DoubleSide})); veil.position.set(0,2.0,-0.3); g.add(veil);
     // left arm (ring hand forward)
@@ -647,8 +1014,9 @@
   let me;
   (function buildMe(){
     const g=new THREE.Group();
-    const skin=0xf0c59a, hair=0x2b2016, suit=0x33465f, shirtW=0xf4f6fb, pants=0x2b3444;
-    const tee=0x4fb0c6, jeans=0x3f5a76, sneaker=0xf4f6fb, casualShoe=0xdcdce4;
+    // 依「我們.JPG」調整：短黑髮、膚色中等、便服改白T
+    const skin=0xeec9a0, hair=0x15110d, suit=0x33465f, shirtW=0xf4f6fb, pants=0x2b3444;
+    const tee=0xf4f6fb, jeans=0x3f5a76, sneaker=0xf4f6fb, casualShoe=0xdcdce4;
 
     // ---- two outfit groups: casual (default) & formal (after proposal) ----
     const casual = new THREE.Group();   // 便服
@@ -661,9 +1029,12 @@
       const sole=new THREE.Mesh(new THREE.BoxGeometry(0.24,0.06,0.3),soft(0xffffff)); sole.position.set(p[0],0.05,0.14); casual.add(sole);});
     [[-0.22],[0.22]].forEach(p=>{const l=new THREE.Mesh(new THREE.CapsuleGeometry(0.16,0.66,6,10),soft(jeans)); l.position.set(p[0],0.55,0); l.castShadow=true; casual.add(l);});
     const teeTorso=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.42,1.0,14),soft(tee)); teeTorso.position.y=1.38; teeTorso.castShadow=true; casual.add(teeTorso);
-    const collar=new THREE.Mesh(new THREE.TorusGeometry(0.18,0.05,8,16),soft(0x3d93a8)); collar.rotation.x=Math.PI/2; collar.position.y=1.82; casual.add(collar);
+    const collar=new THREE.Mesh(new THREE.TorusGeometry(0.18,0.05,8,16),soft(0xd7dbe0)); collar.rotation.x=Math.PI/2; collar.position.y=1.82; casual.add(collar);
     [[-1],[1]].forEach(p=>{const a=new THREE.Mesh(new THREE.CapsuleGeometry(0.13,0.5,6,10),soft(tee)); a.position.set(p[0]*0.56,1.45,0); a.rotation.z=p[0]*0.5; casual.add(a);
       const hd=new THREE.Mesh(new THREE.SphereGeometry(0.12,10,10),soft(skin)); hd.position.set(p[0]*0.88,1.12,p[0]>0?0.25:0); casual.add(hd);});
+    // 黑色後背包（照片中背著黑色後背包）—— 背在身後
+    const pack=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.75,0.28),soft(0x26292e,0.85)); pack.position.set(0,1.42,-0.5); pack.castShadow=true; casual.add(pack);
+    [[-1],[1]].forEach(p=>{const strap=new THREE.Mesh(new THREE.CapsuleGeometry(0.05,0.7,4,6),soft(0x2a2d33)); strap.position.set(p[0]*0.26,1.5,0.3); strap.rotation.x=0.15; casual.add(strap);});
 
     // ===== FORMAL (suit + white shirt + bow tie + dress shoes) =====
     [[-0.22],[0.22]].forEach(p=>{const sh=new THREE.Mesh(new THREE.CapsuleGeometry(0.11,0.18,4,6),soft(0x2a2018)); sh.rotation.z=Math.PI/2; sh.position.set(p[0],0.12,0.12); sh.castShadow=true; formal.add(sh);});
@@ -740,8 +1111,9 @@
     return g;
   }
 
-  // place a family member on the family island (local coords of familyIsle)
-  function addFolk(opt, lx, lz, name){
+  const friendFolks = [];
+  // place a little person on an island. isle = familyIsle | friendsIsle ; list = familyFolks | friendFolks
+  function addPersonTo(isle, list, opt, lx, lz, name){
     const g = makePerson(opt);
     const person = new THREE.Group();
     person.add(g);
@@ -752,23 +1124,18 @@
     person.position.set(lx, 1.3, lz);
     person.rotation.y = Math.atan2(-lx, -lz);   // roughly face island centre
     person.userData = { bubble, hit, baseY:1.3, phase:Math.random()*Math.PI*2 };
-    familyIsle.add(person);
-    familyFolks.push(person);
+    isle.add(person);
+    list.push(person);
   }
+  // shorthands
+  const addFolk   = (opt, lx, lz, name)=> addPersonTo(familyIsle,  familyFolks, opt, lx, lz, name);
+  const addFriend = (opt, lx, lz, name)=> addPersonTo(friendsIsle, friendFolks, opt, lx, lz, name);
 
-  // ---- Wendy's family (left cluster) ----
-  addFolk({kind:'man',  skin:0xf0c59a, hair:0x4a4a4a, cloth:0x5a7a9a}, -3.2, -0.5, "Wendy 爸爸");
-  addFolk({kind:'woman',skin:0xffe0bd, hair:0x6b4a32, cloth:0xff8fab}, -2.0, -1.4, "Wendy 媽媽");
-  addFolk({kind:'woman',skin:0xffe0bd, hair:0x8d5524, cloth:0xa29bfe}, -3.0,  1.0, "Jacky (姐)");
-  addFolk({kind:'girl', skin:0xffe0bd, hair:0x5b3a29, cloth:0xffd166, scale:0.62}, -1.6, 0.3, "Summer (姪女)");
+  // ---- 家人島成員：依 data.js 的 family 讀資料生成 ----
+  familyData.forEach(p => addFolk(p.opt || {}, p.lx, p.lz, p.name || ''));
 
-  // ---- My family (right cluster) ----
-  addFolk({kind:'man',  skin:0xeac086, hair:0x3a3a3a, cloth:0x4a6fa5}, 3.2, -0.5, "我 爸爸");
-  addFolk({kind:'woman',skin:0xf0c59a, hair:0x5a3a28, cloth:0xff9ab0}, 2.0, -1.4, "我 媽媽");
-  addFolk({kind:'woman',skin:0xf0c59a, hair:0x7a4a28, cloth:0x90be6d}, 3.0,  1.0, "我 姐姐");
-  addFolk({kind:'man',  skin:0xeac086, hair:0x2b2016, cloth:0x8d6e63}, 4.0,  0.2, "姊夫");
-  addFolk({kind:'girl', skin:0xf0c59a, hair:0x4a3020, cloth:0xffc8dd, scale:0.6}, 1.8, 0.6, "姪女①");
-  addFolk({kind:'girl', skin:0xf0c59a, hair:0x4a3020, cloth:0xa9e6f0, scale:0.58}, 2.6, 1.3, "姪女②");
+  // ========================= 好友島：好友小人（依 data.js 的 friends 讀資料生成，名單後補只改 data.js） =========================
+  friendsData.forEach(p => addFriend(p.opt || {}, p.lx, p.lz, p.name || ''));
 
   // ========================= raycast / interaction =========================
   const ray = new THREE.Raycaster();
@@ -779,7 +1146,12 @@
   function pick(){ ray.setFromCamera(mouse,camera); const h=ray.intersectObjects(blocks.map(b=>b.userData.cube),false); return h.length?blocks.find(b=>b.userData.cube===h[0].object):null; }
   function pickCritter(){ ray.setFromCamera(mouse,camera); const h=ray.intersectObjects(residents.map(r=>r.userData.hit),false); return h.length?residents.find(r=>r.userData.hit===h[0].object):null; }
   function pickMe(){ ray.setFromCamera(mouse,camera); return ray.intersectObject(me.userData.hit,false).length?me:null; }
-  function pickFolk(){ ray.setFromCamera(mouse,camera); const h=ray.intersectObjects(familyFolks.map(f=>f.userData.hit),false); return h.length?familyFolks.find(f=>f.userData.hit===h[0].object):null; }
+  const allFolks = ()=> familyFolks.concat(friendFolks);
+  function pickFolk(){ ray.setFromCamera(mouse,camera); const list=allFolks(); const h=ray.intersectObjects(list.map(f=>f.userData.hit),false); return h.length?list.find(f=>f.userData.hit===h[0].object):null; }
+  // which island/card a folk belongs to
+  function folkInfo(f){ return friendFolks.includes(f)
+    ? { card:'friends', focus:new THREE.Vector3(-19,2,19) }
+    : { card:'family',  focus:new THREE.Vector3( 19,2,19) }; }
   let hoveredFolk = null;
 
   renderer.domElement.addEventListener('pointermove', e=>{
@@ -796,11 +1168,12 @@
   let downX=0, downY=0;
   renderer.domElement.addEventListener('pointerdown', e=>{ downX=e.clientX; downY=e.clientY; });
   renderer.domElement.addEventListener('pointerup', e=>{
+    if(intro) return;                            // 進場動畫期間鎖住點擊互動
     if(Math.abs(e.clientX-downX)>6 || Math.abs(e.clientY-downY)>6) return;
     pointer(e);
     if(pickMe()){ flyTo(new THREE.Vector3(0,2.2,0), 9); openCard('propose'); return; }
     const b=pick(); if(b){ flyTo(b.userData.focus, 11); openCard(b.userData.key); return; }
-    const f=pickFolk(); if(f){ f.userData.bubble.visible=true; flyTo(new THREE.Vector3(19,2,19), 13); openCard('family'); return; }
+    const f=pickFolk(); if(f){ f.userData.bubble.visible=true; const info=folkInfo(f); flyTo(info.focus, 13); openCard(info.card); return; }
     const c=pickCritter(); if(c){ c.userData.bubble.visible=true; openCard('zoo'); }
   });
 
@@ -815,15 +1188,132 @@
 
   // ========================= card =========================
   const cardEl = document.getElementById('card');
+
+  // ========================= 照片燈箱 Lightbox =========================
+  const lbEl    = document.getElementById('lightbox');
+  const lbImg   = document.getElementById('lb-img');
+  const lbCount = document.getElementById('lb-count');
+  const lbPrev  = lbEl.querySelector('.lb-prev');
+  const lbNext  = lbEl.querySelector('.lb-next');
+  const lbClose = lbEl.querySelector('.lb-close');
+  let lbList = [];          // 當前相簿的照片路徑陣列
+  let lbIndex = 0;
+  let lightboxOpen = false;
+
+  function openLightbox(list, idx){
+    lbList = Array.isArray(list) ? list : [list];
+    lbIndex = Math.max(0, Math.min(idx||0, lbList.length-1));
+    renderLightbox();
+    lbEl.classList.add('show'); lbEl.setAttribute('aria-hidden','false');
+    lightboxOpen = true;
+  }
+  function renderLightbox(){
+    lbImg.src = lbList[lbIndex] || '';
+    const multi = lbList.length > 1;
+    lbPrev.disabled = !multi; lbNext.disabled = !multi;
+    lbCount.style.display = multi ? 'block' : 'none';
+    if(multi) lbCount.textContent = `第 ${lbIndex+1} / 共 ${lbList.length} 張`;
+  }
+  function lbStep(dir){
+    if(lbList.length<2) return;
+    lbIndex = (lbIndex + dir + lbList.length) % lbList.length;
+    renderLightbox();
+  }
+  function closeLightbox(){
+    lbEl.classList.remove('show'); lbEl.setAttribute('aria-hidden','true');
+    lightboxOpen = false; lbImg.src='';
+  }
+  lbPrev.addEventListener('click', e=>{ e.stopPropagation(); lbStep(-1); });
+  lbNext.addEventListener('click', e=>{ e.stopPropagation(); lbStep(1); });
+  lbClose.addEventListener('click', e=>{ e.stopPropagation(); closeLightbox(); });
+  lbEl.addEventListener('click', e=>{ if(e.target===lbEl) closeLightbox(); });   // 點遮罩關閉
+  // 手機左右滑動切換
+  let lbTouchX = null;
+  lbEl.addEventListener('touchstart', e=>{ lbTouchX = e.touches[0].clientX; }, {passive:true});
+  lbEl.addEventListener('touchend', e=>{
+    if(lbTouchX===null) return;
+    const dx = e.changedTouches[0].clientX - lbTouchX;
+    if(Math.abs(dx)>40) lbStep(dx<0 ? 1 : -1);
+    lbTouchX = null;
+  });
+
+  // 綁定卡片內照片／縮圖：點 .photo 開單張；點 .thumb 開該旅行地點相簿
+  function wireCardMedia(bodyEl){
+    bodyEl.querySelectorAll('.photo').forEach(img=>{
+      img.addEventListener('click', ()=> openLightbox([img.getAttribute('src')], 0));
+    });
+    bodyEl.querySelectorAll('.thumb').forEach(img=>{
+      img.addEventListener('click', ()=>{
+        const ti = parseInt(img.getAttribute('data-trip'), 10);
+        const pi = parseInt(img.getAttribute('data-idx'), 10) || 0;
+        const t = tripsData[ti];
+        const photos = (t && Array.isArray(t.photos)) ? t.photos : [img.getAttribute('src')];
+        openLightbox(photos, pi);
+      });
+    });
+  }
+
+  // ========================= 音訊（BGM + 音效，缺檔靜默防呆）=========================
+  const bgmBtn = document.getElementById('bgmBtn');
+  let bgmAudio = null, bgmOn = false;
+  const sfxCache = {};
+
+  function makeAudio(src, vol, loop){
+    if(!src) return null;
+    try{
+      const a = new Audio(src);
+      a.volume = (typeof vol==='number') ? vol : 0.5;
+      a.loop = !!loop;
+      a.addEventListener('error', ()=>{ /* 缺檔／載入失敗：靜默略過 */ });
+      return a;
+    }catch(e){ return null; }
+  }
+  function sfxPlay(name){
+    try{
+      const src = (audioData.sfx || {})[name];
+      if(!src) return;
+      let a = sfxCache[name];
+      if(!a){ a = makeAudio(src, audioData.sfxVolume, false); sfxCache[name] = a; }
+      if(a){ a.currentTime = 0; a.play().catch(()=>{}); }
+    }catch(e){ /* 靜默 */ }
+  }
+  function bgmSetOn(on){
+    bgmOn = on;
+    if(on){
+      if(!bgmAudio) bgmAudio = makeAudio(audioData.bgmSrc, audioData.bgmVolume, true);
+      if(bgmAudio) bgmAudio.play().catch(()=>{});   // 自動播放被擋時不報錯
+      bgmBtn.textContent = '🔊 音樂';
+    }else{
+      if(bgmAudio) bgmAudio.pause();
+      bgmBtn.textContent = '🔇 音樂';
+    }
+  }
+  bgmBtn.addEventListener('click', ()=> bgmSetOn(!bgmOn));
+  // 預設開啟時，等第一次互動再嘗試播放（遵守自動播放政策）
+  if(audioData.bgmDefaultOn){
+    const kick = ()=>{ bgmSetOn(true); window.removeEventListener('pointerdown', kick); };
+    window.addEventListener('pointerdown', kick, {once:true});
+  }
+
   function openCard(key){
     const d=DATA[key];
-    document.getElementById('card-ic').textContent=d.ic;
-    document.getElementById('card-title').textContent=d.title;
-    document.getElementById('card-body').innerHTML=d.html;
+    if(!d) return;                               // 缺卡防呆，不崩潰
+    sfxPlay('click');                            // 點島／開卡片音效（缺檔靜默）
+    document.getElementById('card-ic').textContent=d.ic || '💖';
+    document.getElementById('card-title').textContent=d.title || '';
+    // zoo / trips 由資料動態生成；其餘用卡片 html
+    let html;
+    if(key==='zoo')      html = buildZooHtml();
+    else if(key==='trips') html = buildTripsHtml();
+    else                 html = d.html || '';
+    const bodyEl = document.getElementById('card-body');
+    bodyEl.innerHTML = html;
+    wireCardMedia(bodyEl);                        // 綁定照片／縮圖的 Lightbox
     cardEl.classList.toggle('propose', key==='propose');
     cardEl.classList.add('show');
     controls.autoRotate=false; hintEl.style.opacity=0;
     if(key==='propose'){
+      forceDuskForPropose();   // 求婚：強制平滑切到黃昏並點燈
       revealRingBox();   // the moment of truth: he takes out the ring box
       wirePropose();
     }
@@ -838,16 +1328,22 @@
     }
   }
   function closeCard(){
+    if(lightboxOpen){ closeLightbox(); return; }   // 燈箱開著時，先關燈箱
     cardEl.classList.remove('show'); controls.autoRotate=true;
     // if proposal was opened but not accepted, revert to casual + hide ring (keep surprise)
     if(!ringGiven && me){
       me.userData.casual.visible=true;
       me.userData.formal.visible=false;
       ['box','lid','ringInBox'].forEach(k=>{ if(me.userData[k]) me.userData[k].visible=false; });
+      restoreDayNightAfterPropose();   // 未答應：平滑還原到進入前日夜狀態並熄燈
     }
   }
   cardEl.querySelector('.close').addEventListener('click', closeCard);
-  addEventListener('keydown', e=>{ if(e.key==='Escape') closeCard(); });
+  addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ if(lightboxOpen) closeLightbox(); else closeCard(); }
+    else if(lightboxOpen && e.key==='ArrowLeft')  lbStep(-1);
+    else if(lightboxOpen && e.key==='ArrowRight') lbStep(1);
+  });
 
   // ========================= propose =========================
   function wirePropose(){
@@ -857,6 +1353,7 @@
       document.getElementById('propose-actions').style.display='none';
       document.getElementById('propose-answer').style.display='block';
       confettiBurst();
+      sfxPlay('propose');   // 求婚成功慶祝音效（缺檔靜默）
       proposeActive=true;
       giveRing();
     });
@@ -901,11 +1398,42 @@
   // ========================= resize =========================
   addEventListener('resize', ()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 
+  // ========================= 進場動畫（鏡頭從遠方海面低角度飛近主島）=========================
+  const INTRO_VIEW = { pos:new THREE.Vector3(24,22,30), tgt:new THREE.Vector3(0,1.5,0) };
+  let intro = null;
+  function startIntro(){
+    camera.position.set(76, 3.5, 68);              // 遠方、貼近海面、低角度
+    controls.target.set(0, 1.5, 0);
+    controls.enabled = false; controls.autoRotate = false;
+    intro = { camFrom:camera.position.clone(), camTo:INTRO_VIEW.pos.clone(),
+      tgtFrom:controls.target.clone(), tgtTo:INTRO_VIEW.tgt.clone(), t:0, dur:3.6 };
+  }
+
   // ========================= animate =========================
   const clock = new THREE.Clock();
+  let elapsed = 0;
   function animate(){
     requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
+    const dt = Math.min(clock.getDelta(), 0.05);   // 夾住大幀距，避免切背景分頁後跳動
+    elapsed += dt;
+    const t = elapsed;
+
+    // ---- 日夜循環 ----
+    if(dnTween){
+      dnTween.t = Math.min(1, dnTween.t + dt/dnTween.dur);
+      const e = 1-Math.pow(1-dnTween.t, 3);
+      // 以最短路徑插值 phase
+      let from=dnTween.from, to=dnTween.to, diff=to-from;
+      if(diff> 0.5) diff-=1; if(diff<-0.5) diff+=1;
+      dayNightPhase = ((from + diff*e) % 1 + 1) % 1;
+      if(dnTween.t>=1){ if(dnTween.after) dnTween.after(); dnTween=null; }
+    } else if(dnAuto){
+      dayNightPhase = (dayNightPhase + dt/DN_CYCLE) % 1;
+    }
+    applyDayNightPhase(dayNightPhase);
+
+    // 暖色點燈平滑亮/滅
+    warmLights.forEach(l=>{ l.intensity += (l.userData.targetInt - l.intensity) * Math.min(1, dt*3); });
 
     // sea waves
     const pos=sea.geometry.attributes.position;
@@ -920,7 +1448,14 @@
     if(wendy){ wendy.position.y=wendy.userData.baseY+Math.sin(t*1.1)*0.1; wendy.rotation.y=0.4+Math.sin(t*0.5)*0.15; }
     if(me){ me.position.y=me.userData.baseY+Math.sin(t*1.1+1)*0.1; }
 
-    if(fly){ fly.t=Math.min(1,fly.t+0.02); const e=1-Math.pow(1-fly.t,3);
+    // 進場飛行（優先於一般 flyTo）
+    if(intro){
+      intro.t = Math.min(1, intro.t + dt/intro.dur);
+      const e = 1-Math.pow(1-intro.t, 3);
+      camera.position.lerpVectors(intro.camFrom, intro.camTo, e);
+      controls.target.lerpVectors(intro.tgtFrom, intro.tgtTo, e);
+      if(intro.t>=1){ intro=null; controls.enabled=true; controls.autoRotate=true; }
+    } else if(fly){ fly.t=Math.min(1,fly.t+0.02); const e=1-Math.pow(1-fly.t,3);
       camera.position.lerpVectors(fly.camFrom,fly.camTo,e); controls.target.lerpVectors(fly.tgtFrom,fly.tgtTo,e); if(fly.t>=1) fly=null; }
 
     if(proposeActive) heartRainStep();
@@ -946,18 +1481,47 @@
       const flap=Math.sin(t*8+u.ang)*0.5; u.wL.rotation.z=Math.PI/2+flap; u.wR.rotation.z=-Math.PI/2-flap;
     });
 
-    // family folks: gentle sway + hover pop
-    familyFolks.forEach(f=>{
+    // family + friend folks: gentle sway + hover pop
+    allFolks().forEach(f=>{
       const u=f.userData;
       f.position.y=u.baseY+Math.sin(t*2+u.phase)*0.06;
       f.rotation.z=Math.sin(t*1.5+u.phase)*0.03;
       const s=(f===hoveredFolk)?1.18:1; f.scale.lerp(new THREE.Vector3(s,s,s),0.18);
     });
 
+    // 雲倒影跟著雲 x 移動
+    cloudRefls.forEach(cr=>{ cr.mesh.position.x = cr.cloud.position.x; });
+
+    // ---- 粒子更新 ----
+    // 花瓣：緩降 + 左右搖擺，落到海面重置回高空
+    const pp = petals.geometry.attributes.position;
+    for(let i=0;i<PETAL_N;i++){
+      const d=petalData[i];
+      let y = pp.array[i*3+1] - d.fall*dt;
+      let x = d.baseX + Math.sin(t*0.8 + d.swing)*d.swAmp;
+      if(y < seaY){ y = 14+Math.random()*8; d.baseX=(Math.random()-0.5)*60; pp.array[i*3+2]=(Math.random()-0.5)*60; }
+      pp.array[i*3]=x; pp.array[i*3+1]=y;
+    }
+    pp.needsUpdate = true;
+    // 螢火蟲：緩慢遊走 + 明滅（明滅用整體 opacity 的夜晚因子已在日夜回呼處理，這裡做位置遊走與個別微閃）
+    if(flyMat.opacity > 0.01){
+      const fp = fireflies.geometry.attributes.position;
+      for(let i=0;i<FLY_N;i++){
+        const d=flyData[i];
+        fp.array[i*3]   = d.cx + Math.sin(t*0.4 + d.drift)*d.dr;
+        fp.array[i*3+1] = d.cy + Math.sin(t*0.6 + d.phase)*0.6;
+        fp.array[i*3+2] = d.cz + Math.cos(t*0.4 + d.drift)*d.dr;
+      }
+      fp.needsUpdate = true;
+    }
+    // 海面反光：整體閃爍（size 呼吸）
+    sparkMat.size = 0.5 + Math.abs(Math.sin(t*2))*0.4;
+
     controls.update(); renderer.render(scene, camera);
   }
   animate();
 
+  startIntro();                                   // 一開始就定位到遠方起點，進場飛行
   setTimeout(()=> loaderEl.classList.add('hide'), 500);
   setTimeout(()=>{ hintEl.style.opacity=0; }, 10000);
   </script>
