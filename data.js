@@ -16,8 +16,8 @@
 
     // ---- 動物居民（建構子 key、座標、台詞、島卡 chip 的 emoji 與名稱）----
     animals: [
-      { key: 'cat',       x: -3,   z: 3,   say: '喵～最愛寶寶',   chipEmoji: '🐱', chipName: '貓' },
-      { key: 'dog',       x: 5,    z: -1,  say: '汪！忠心陪伴',   chipEmoji: '🐶', chipName: '狗' },
+      { key: 'cat',       x: -3,   z: 3,   say: '喵～最愛寶寶',   chipEmoji: '🐱', chipName: '三花貓' },
+      { key: 'dog',       x: 5,    z: -1,  say: '汪！短腿陪你跑', chipEmoji: '🐶', chipName: '柯基' },
       { key: 'turtle',    x: 2.5,  z: 3.5, say: '慢慢來，有我在', chipEmoji: '🐢', chipName: '烏龜' },
       { key: 'pony',      x: -5.5, z: -1,  say: '帶你去冒險',     chipEmoji: '🐴', chipName: '小馬' },
       { key: 'sheep',     x: 0,    z: 5,   say: '咩～軟綿綿抱抱', chipEmoji: '🐑', chipName: '羊' },
@@ -57,7 +57,9 @@
           '<div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>' +
           '<div class="row"><div class="k">👩</div><div class="v"><b>媽媽</b></div></div>' +
           '<div class="row"><div class="k">👧</div><div class="v"><b>Jacky</b>　姐姐</div></div>' +
-          '<div class="row"><div class="k">🧒</div><div class="v"><b>Summer</b>　姪女</div></div>' +
+          '<div class="row"><div class="k">🧒</div><div class="v"><b>Summer</b>　姪女</div></div>',
+        // 「我的家人」區塊：求婚前不顯示（保密），求婚成功（按 Yes）後才接在上面內容後面
+        htmlAfterPropose:
           '<div class="group-title">💙 我的家人</div>' +
           '<img class="photo" src="' + PHOTOS.myFamily + '" alt="我的家人" loading="lazy">' +
           '<div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>' +
@@ -71,6 +73,17 @@
           '<p style="text-align:center;color:#7a95a3;line-height:1.8;margin-bottom:6px">' +
           '一路上陪我們笑、陪我們鬧的好朋友們 💚<br>' +
           '<span style="font-size:.9rem;color:#aab8c0">（好友名單整理中，很快就會住進島上）</span></p>'
+      },
+      disney: {
+        ic: '🏰', title: '夢幻樂園・迪士尼島', html:
+          '<p style="text-align:center;color:#6b7b86;line-height:1.9;margin-bottom:6px">' +
+          '這座島屬於童話與煙火 🎆<br>' +
+          '城堡在夢幻的粉白與金頂裡發光，旋轉木馬緩緩轉著，<br>' +
+          '圓耳朵的小夥伴在草地上迎接每一位來訪的旅人。</p>' +
+          '<div class="row"><div class="k">🏰</div><div class="v"><b>童話城堡</b><br>點一下城堡，白天認識這座島；夜晚則會為妳放一輪煙火。</div></div>' +
+          '<div class="row"><div class="k">🎠</div><div class="v"><b>旋轉木馬</b><br>想像牽著手坐上木馬，繞著圈圈笑到停不下來。</div></div>' +
+          '<div class="row"><div class="k">🎆</div><div class="v"><b>夜晚煙火</b><br>最浪漫的事，是和寶寶一起抬頭看同一片煙火。</div></div>' +
+          '<p style="text-align:center;margin-top:14px;color:#7a95a3">總有一天，帶妳去真正的樂園看煙火 💕</p>'
       },
       propose: {
         ic: '💍', title: 'Will you marry me?', html:
@@ -87,15 +100,17 @@
       }
     },
 
-    // ---- 旅行島相簿（每地點：emoji 旗、name 標題、note 回憶短文、photos 照片路徑陣列）----
-    //      ★ 要補旅遊照片時：把照片放到 photo/ 資料夾，再把檔名加進對應地點的 photos 陣列即可，
-    //        例如 photos: ['photo/富國島1.jpg', 'photo/富國島2.jpg']。photos 為空時會顯示「照片整理中」佔位。
+    // ---- 旅行島相簿（每地點：emoji 旗、name 標題、note 回憶短文、folder 照片資料夾、photos 照片路徑陣列）----
+    //      ★ 各景點已建好分類資料夾（photo/<folder>/）。把該景點照片丟進對應資料夾後，
+    //        把檔名（含資料夾）加進 photos 陣列即可，例如：
+    //          folder: 'photo/富國島', photos: ['photo/富國島/1.jpg', 'photo/富國島/2.jpg']
+    //        photos 為空時會顯示「照片整理中」佔位。相簿在卡片內以投影片輪播呈現，點投影片可全螢幕放大。
     trips: [
-      { flag: '🇻🇳', name: '富國島', note: '陽光、海灘與椰林，踩著細白沙，看海到天黑的那幾天。', photos: [] },
-      { flag: '🗼', name: '東京',   note: '繁華又浪漫的日本，街角咖啡與夜晚霓虹，牽著手亂走也開心。', photos: [] },
-      { flag: '🌺', name: '沖繩',   note: '碧海藍天的度假島，海水透到見底，吃冰配海風的悠閒。', photos: [] },
-      { flag: '🇰🇷', name: '釜山',   note: '海港城市的悠閒，海雲台的浪、甘川洞的彩色小屋。', photos: [] },
-      { flag: '🏔️', name: '湯澤',   note: '雪國溫泉的浪漫，泡湯看雪、滑雪跌成一團笑的冬天。', photos: [] }
+      { flag: '🇻🇳', name: '富國島', folder: 'photo/富國島', note: '陽光、海灘與椰林，踩著細白沙，看海到天黑的那幾天。', photos: [] },
+      { flag: '🗼', name: '東京',   folder: 'photo/東京',   note: '繁華又浪漫的日本，街角咖啡與夜晚霓虹，牽著手亂走也開心。', photos: [] },
+      { flag: '🌺', name: '沖繩',   folder: 'photo/沖繩', note: '碧海藍天的度假島，海水透到見底，吃冰配海風的悠閒。', photos: [] },
+      { flag: '🇰🇷', name: '釜山',   folder: 'photo/釜山',   note: '海港城市的悠閒，海雲台的浪、甘川洞的彩色小屋。', photos: [] },
+      { flag: '🏔️', name: '湯澤',   folder: 'photo/湯澤',  note: '雪國溫泉的浪漫，泡湯看雪、滑雪跌成一團笑的冬天。', photos: [] }
     ],
 
     // ---- 音訊設定（BGM / 音效）----
@@ -114,19 +129,20 @@
     },
 
     // ---- 家人島成員（opt 給 makePerson；lx/lz 島上座標；name 泡泡名字）----
+    // side: 'gf' = Wendy 的家人（一直顯示）；'me' = 我的家人（求婚前是秘密，求婚成功才出現在島上）
     family: [
       // Wendy 的家人（左側）
-      { opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x4a4a4a, cloth: 0x5a7a9a },              lx: -3.2, lz: -0.5, name: 'Wendy 爸爸' },
-      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x6b4a32, cloth: 0xff8fab },              lx: -2.0, lz: -1.4, name: 'Wendy 媽媽' },
-      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x8d5524, cloth: 0xa29bfe },              lx: -3.0, lz: 1.0,  name: 'Jacky (姐)' },
-      { opt: { kind: 'girl',  skin: 0xffe0bd, hair: 0x5b3a29, cloth: 0xffd166, scale: 0.62 }, lx: -1.6, lz: 0.3,  name: 'Summer (姪女)' },
-      // 我的家人（右側）
-      { opt: { kind: 'man',   skin: 0xeac086, hair: 0x3a3a3a, cloth: 0x4a6fa5 },              lx: 3.2,  lz: -0.5, name: '我 爸爸' },
-      { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x5a3a28, cloth: 0xff9ab0 },              lx: 2.0,  lz: -1.4, name: '我 媽媽' },
-      { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x7a4a28, cloth: 0x90be6d },              lx: 3.0,  lz: 1.0,  name: '我 姐姐' },
-      { opt: { kind: 'man',   skin: 0xeac086, hair: 0x2b2016, cloth: 0x8d6e63 },              lx: 4.0,  lz: 0.2,  name: '姊夫' },
-      { opt: { kind: 'girl',  skin: 0xf0c59a, hair: 0x4a3020, cloth: 0xffc8dd, scale: 0.6 },  lx: 1.8,  lz: 0.6,  name: '姪女①' },
-      { opt: { kind: 'girl',  skin: 0xf0c59a, hair: 0x4a3020, cloth: 0xa9e6f0, scale: 0.58 }, lx: 2.6,  lz: 1.3,  name: '姪女②' }
+      { side: 'gf', opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x4a4a4a, cloth: 0x5a7a9a },              lx: -3.2, lz: -0.5, name: 'Wendy 爸爸' },
+      { side: 'gf', opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x6b4a32, cloth: 0xff8fab },              lx: -2.0, lz: -1.4, name: 'Wendy 媽媽' },
+      { side: 'gf', opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x8d5524, cloth: 0xa29bfe },              lx: -3.0, lz: 1.0,  name: 'Jacky (姐)' },
+      { side: 'gf', opt: { kind: 'girl',  skin: 0xffe0bd, hair: 0x5b3a29, cloth: 0xffd166, scale: 0.62 }, lx: -1.6, lz: 0.3,  name: 'Summer (姪女)' },
+      // 我的家人（右側）—— 求婚前保密，求婚成功才出現
+      { side: 'me', opt: { kind: 'man',   skin: 0xeac086, hair: 0x3a3a3a, cloth: 0x4a6fa5 },              lx: 3.2,  lz: -0.5, name: '我 爸爸' },
+      { side: 'me', opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x5a3a28, cloth: 0xff9ab0 },              lx: 2.0,  lz: -1.4, name: '我 媽媽' },
+      { side: 'me', opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x7a4a28, cloth: 0x90be6d },              lx: 3.0,  lz: 1.0,  name: '我 姐姐' },
+      { side: 'me', opt: { kind: 'man',   skin: 0xeac086, hair: 0x2b2016, cloth: 0x8d6e63 },              lx: 4.0,  lz: 0.2,  name: '姊夫' },
+      { side: 'me', opt: { kind: 'girl',  skin: 0xf0c59a, hair: 0x4a3020, cloth: 0xffc8dd, scale: 0.6 },  lx: 1.8,  lz: 0.6,  name: '姪女①' },
+      { side: 'me', opt: { kind: 'girl',  skin: 0xf0c59a, hair: 0x4a3020, cloth: 0xa9e6f0, scale: 0.58 }, lx: 2.6,  lz: 1.3,  name: '姪女②' }
     ],
 
     // ---- 好友島成員（名單後補，先放 5 位佔位）----
@@ -136,6 +152,15 @@
       { opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x3a2a20, cloth: 0x8ccf8a }, lx: 2.6,  lz: -0.6, name: '好友（待補）' },
       { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x7a4a28, cloth: 0xffd166 }, lx: 1.2,  lz: 1.0,  name: '好友（待補）' },
       { opt: { kind: 'man',   skin: 0xeec9a0, hair: 0x15110d, cloth: 0xcdb4db }, lx: -1.2, lz: 1.0,  name: '好友（待補）' }
+    ],
+
+    // ---- 迪士尼島圓耳朵吉祥物小人（原創致敬風格，非特定角色）----
+    //      body/ears/face 為自創配色，避免抄襲任何可辨識的具體角色特徵。
+    //      lx/lz 為島上座標；say 為 hover 對話泡泡文字。
+    disneyFolks: [
+      { body: 0x7cc4f0, ears: 0x4a6fd8, belly: 0xffffff, say: '歡迎來到迪士尼島！', lx: 2.2,  lz: 1.6 },
+      { body: 0xffc36e, ears: 0xe8923a, belly: 0xfff2d6, say: '一起看煙火吧～',     lx: -2.4, lz: 1.8 },
+      { body: 0xb79cf0, ears: 0x7b5fd0, belly: 0xf3ecff, say: '城堡好漂亮對不對？', lx: 3.0,  lz: -1.4 }
     ]
   };
 })();
