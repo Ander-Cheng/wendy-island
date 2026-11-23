@@ -1221,13 +1221,11 @@
     const neck=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.15,0.2,16),soft(skin)); neck.position.y=1.9; g.add(neck); // L1：脖子 radial 8→16
     const head=new THREE.Mesh(new THREE.SphereGeometry(0.52,16,16),soft(skin)); head.scale.set(1,1.08,1); head.position.y=2.25; head.castShadow=true; g.add(head);
     // hair
-    const hairBack=new THREE.Mesh(new THREE.SphereGeometry(0.58,16,16),soft(hair)); hairBack.position.set(0,2.3,-0.06); hairBack.scale.set(1.05,1.12,1); g.add(hairBack);
+    const hairBack=new THREE.Mesh(new THREE.SphereGeometry(0.57,16,16,Math.PI,Math.PI,0,Math.PI),soft(hair)); hairBack.position.set(0,2.26,0); hairBack.scale.set(1.04,1.08,1.0); g.add(hairBack);   // 與其他女生同款：後腦髮球
     // 瀏海（齊瀏海，照片為黑色長直髮配瀏海）
     const fringe=new THREE.Mesh(new THREE.SphereGeometry(0.56,16,16,0,Math.PI*2,0,Math.PI/2.3),soft(hair)); fringe.position.set(0,2.45,0.04); fringe.scale.set(1.04,0.9,1.02); g.add(fringe);
-    // 長直髮：兩側各一束順肩垂下（取代原本的雙馬尾）
-    [[-0.5],[0.5]].forEach(p=>{const strand=new THREE.Mesh(new THREE.CapsuleGeometry(0.2,1.15,8,12),soft(hair)); strand.position.set(p[0],1.45,-0.02); strand.scale.set(0.9,1,0.75); g.add(strand);});
-    // 後方長直髮（背面長度）
-    const hairLong=new THREE.Mesh(new THREE.CapsuleGeometry(0.4,1.1,10,16),soft(hair)); hairLong.position.set(0,1.5,-0.32); hairLong.scale.set(1.1,1,0.55); g.add(hairLong);
+    // 與其他女生同款：後腦包包頭（不蓋臉兩側）
+    const bun=new THREE.Mesh(new THREE.SphereGeometry(0.24,14,14),soft(hair)); bun.position.set(0,2.45,-0.46); g.add(bun);
     // eyes with highlight + lash
     [[-0.19],[0.19]].forEach(p=>{const e=eyeBall(0.085); e.position.set(p[0],2.27,0.46); g.add(e);
       const lash=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.03,0.02),soft(0x2b2d42)); lash.position.set(p[0],2.37,0.47); lash.rotation.z=p[0]>0?-0.2:0.2; g.add(lash);});
@@ -1347,11 +1345,14 @@
     const head=new THREE.Mesh(new THREE.SphereGeometry(0.32*s,16,16),soft(skin)); head.scale.set(1,1.06,1); head.position.y=headY; head.castShadow=true; g.add(head);
     // hair
     if(kind==='woman'){
-      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.36*s,16,16),soft(hair)); hb.position.set(0,headY+0.02*s,-0.04*s); hb.scale.set(1.05,1.1,1); g.add(hb); // L1：14→16
+      // 長髮只從頭頂與後腦垂下，不蓋住臉兩側：後半球 + 頭頂帽
+      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.35*s,16,16,Math.PI,Math.PI,0,Math.PI),soft(hair)); hb.position.set(0,headY+0.01*s,0); hb.scale.set(1.04,1.08,1.0); g.add(hb);
+      const hcap=new THREE.Mesh(new THREE.SphereGeometry(0.35*s,16,16,0,Math.PI*2,0,Math.PI/2.4),soft(hair)); hcap.position.set(0,headY+0.02*s,0); hcap.scale.set(1.05,1.1,1.03); g.add(hcap);
       const bun=new THREE.Mesh(new THREE.SphereGeometry(0.15*s,12,12),soft(hair)); bun.position.set(0,headY+0.12*s,-0.28*s); g.add(bun); // L1：10→12
     }else if(kind==='girl'){
-      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.35*s,16,16),soft(hair)); hb.position.set(0,headY+0.02*s,-0.03*s); g.add(hb); // L1：14→16
-      [[-0.3],[0.3]].forEach(p=>{const pt=new THREE.Mesh(new THREE.CapsuleGeometry(0.1*s,0.2*s,6,8),soft(hair)); pt.position.set(p[0]*s,headY-0.08*s,-0.04*s); g.add(pt);
+      const hb=new THREE.Mesh(new THREE.SphereGeometry(0.34*s,16,16,Math.PI,Math.PI,0,Math.PI),soft(hair)); hb.position.set(0,headY+0.01*s,0); hb.scale.set(1.04,1.08,1.0); g.add(hb);
+      const hcap=new THREE.Mesh(new THREE.SphereGeometry(0.34*s,16,16,0,Math.PI*2,0,Math.PI/2.4),soft(hair)); hcap.position.set(0,headY+0.02*s,0); hcap.scale.set(1.05,1.1,1.03); g.add(hcap);
+      [[-0.3],[0.3]].forEach(p=>{const pt=new THREE.Mesh(new THREE.CapsuleGeometry(0.1*s,0.2*s,6,8),soft(hair)); pt.position.set(p[0]*1.1*s,headY-0.1*s,-0.14*s); g.add(pt);
         const bow=new THREE.Mesh(new THREE.SphereGeometry(0.06*s,8,8),soft(0xff5d8f)); bow.position.set(p[0]*0.32*s,headY+0.06*s,-0.04*s); g.add(bow);});
     }else{
       const hb=new THREE.Mesh(new THREE.SphereGeometry(0.34*s,16,16,0,Math.PI*2,0,Math.PI/1.85),soft(hair)); hb.position.set(0,headY+0.04*s,0); g.add(hb); // L1：14→16

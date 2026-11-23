@@ -7,8 +7,9 @@
   // 照片路徑（以 photo/ 資料夾內的實體檔名為準）
   var PHOTOS = {
     us: 'photo/我們.JPG',
-    gfFamily: 'photo/女朋友家人.JPG',
-    myFamily: 'photo/我家人.HEIC'   // 實體檔為 .HEIC
+    gfFamily: 'photo/女方家人/女朋友家人.JPG',
+    gfFamily2: 'photo/女方家人/女方家人_1.png',
+    myFamily: 'photo/我家人.jpg'
   };
 
   window.ISLAND_DATA = {
@@ -54,9 +55,10 @@
         ic: '👨‍👩‍👧‍👦', title: '我們的家人島', html:
           '<div class="group-title">💖 Wendy 的家人</div>' +
           '<img class="photo" src="' + PHOTOS.gfFamily + '" alt="Wendy 的家人" loading="lazy">' +
+          '<img class="photo" src="' + PHOTOS.gfFamily2 + '" alt="Wendy 的家人" loading="lazy">' +
           '<div class="row"><div class="k">👨</div><div class="v"><b>爸爸</b></div></div>' +
           '<div class="row"><div class="k">👩</div><div class="v"><b>媽媽</b></div></div>' +
-          '<div class="row"><div class="k">👧</div><div class="v"><b>Jacky</b>　姐姐</div></div>' +
+          '<div class="row"><div class="k">👧</div><div class="v"><b>Jackie</b>　姐姐</div></div>' +
           '<div class="row"><div class="k">🧒</div><div class="v"><b>Summer</b>　姪女</div></div>',
         // 「我的家人」區塊：求婚前不顯示（保密），求婚成功（按 Yes）後才接在上面內容後面
         htmlAfterPropose:
@@ -70,9 +72,19 @@
       },
       friends: {
         ic: '🤝', title: '我們的好友島', html:
-          '<p style="text-align:center;color:#7a95a3;line-height:1.8;margin-bottom:6px">' +
-          '一路上陪我們笑、陪我們鬧的好朋友們 💚<br>' +
-          '<span style="font-size:.9rem;color:#aab8c0">（好友名單整理中，很快就會住進島上）</span></p>'
+          '<p style="text-align:center;color:#7a95a3;line-height:1.8;margin-bottom:6px">一路上陪我們笑、陪我們鬧的好朋友們 💚</p>' +
+          '<div class="group-title">🎒 國小同學</div>' +
+          '<img class="photo" src="photo/國小同學/國小同學_1.png" alt="國小同學" loading="lazy">' +
+          '<div class="group-title">📚 國中同學</div>' +
+          '<img class="photo" src="photo/國中同學/國中同學_1.png" alt="國中同學" loading="lazy">' +
+          '<img class="photo" src="photo/國中同學/國中同學_2.png" alt="國中同學" loading="lazy">' +
+          '<div class="group-title">🏫 高中同學</div>' +
+          '<img class="photo" src="photo/高中同學/高中同學_1.png" alt="高中同學" loading="lazy">' +
+          '<div class="group-title">🎓 大學同學</div>' +
+          '<img class="photo" src="photo/大學同學/大學同學_1.png" alt="大學同學" loading="lazy">' +
+          '<div class="group-title">💼 CB 同事</div>' +
+          '<img class="photo" src="photo/CB同事/CB同事_1.png" alt="CB 同事" loading="lazy">' +
+          '<img class="photo" src="photo/CB同事/CB同事_2.png" alt="CB 同事" loading="lazy">'
       },
       disney: {
         ic: '🏰', title: '夢幻樂園・迪士尼島', html:
@@ -106,11 +118,11 @@
     //          folder: 'photo/富國島', photos: ['photo/富國島/1.jpg', 'photo/富國島/2.jpg']
     //        photos 為空時會顯示「照片整理中」佔位。相簿在卡片內以投影片輪播呈現，點投影片可全螢幕放大。
     trips: [
-      { flag: '🇻🇳', name: '富國島', folder: 'photo/富國島', note: '陽光、海灘與椰林，踩著細白沙，看海到天黑的那幾天。', photos: [] },
-      { flag: '🗼', name: '東京',   folder: 'photo/東京',   note: '繁華又浪漫的日本，街角咖啡與夜晚霓虹，牽著手亂走也開心。', photos: [] },
-      { flag: '🌺', name: '沖繩',   folder: 'photo/沖繩', note: '碧海藍天的度假島，海水透到見底，吃冰配海風的悠閒。', photos: [] },
-      { flag: '🇰🇷', name: '釜山',   folder: 'photo/釜山',   note: '海港城市的悠閒，海雲台的浪、甘川洞的彩色小屋。', photos: [] },
-      { flag: '🏔️', name: '湯澤',   folder: 'photo/湯澤',  note: '雪國溫泉的浪漫，泡湯看雪、滑雪跌成一團笑的冬天。', photos: [] }
+      { flag: '🇻🇳', name: '富國島', folder: 'photo/富國島', note: '陽光、海灘與椰林，踩著細白沙，看海到天黑的那幾天。', photos: ['photo/富國島/富國島_1.png', 'photo/富國島/富國島_2.jpg', 'photo/富國島/富國島_3.jpg', 'photo/富國島/富國島_4.jpg', 'photo/富國島/富國島_5.jpg', 'photo/富國島/富國島_6.jpg', 'photo/富國島/富國島_7.jpg'] },
+      { flag: '🗼', name: '東京',   folder: 'photo/東京',   note: '繁華又浪漫的日本，街角咖啡與夜晚霓虹，牽著手亂走也開心。', photos: ['photo/東京/東京_1.jpg', 'photo/東京/東京_2.jpg', 'photo/東京/東京_3.jpg', 'photo/東京/東京_4.jpg', 'photo/東京/東京_5.jpg', 'photo/東京/東京_6.jpg', 'photo/東京/東京_7.jpg', 'photo/東京/東京_8.jpg', 'photo/東京/東京_9.jpg'] },
+      { flag: '🌺', name: '沖繩',   folder: 'photo/沖繩', note: '碧海藍天的度假島，海水透到見底，吃冰配海風的悠閒。', photos: ['photo/沖繩/沖繩_1.JPG', 'photo/沖繩/沖繩_2.JPG', 'photo/沖繩/沖繩_3.JPG', 'photo/沖繩/沖繩_4.JPG', 'photo/沖繩/沖繩_5.JPG', 'photo/沖繩/沖繩_6.JPG', 'photo/沖繩/沖繩_7.JPG', 'photo/沖繩/沖繩_8.JPG', 'photo/沖繩/沖繩_9.JPG'] },
+      { flag: '🇰🇷', name: '釜山',   folder: 'photo/釜山',   note: '海港城市的悠閒，海雲台的浪、甘川洞的彩色小屋。', photos: ['photo/釜山/釜山_1.JPG', 'photo/釜山/釜山_2.JPG', 'photo/釜山/釜山_3.JPG', 'photo/釜山/釜山_4.JPG', 'photo/釜山/釜山_5.JPG', 'photo/釜山/釜山_6.JPG', 'photo/釜山/釜山_7.JPG', 'photo/釜山/釜山_8.JPG'] },
+      { flag: '🏔️', name: '湯澤',   folder: 'photo/湯澤',  note: '雪國溫泉的浪漫，泡湯看雪、滑雪跌成一團笑的冬天。', photos: ['photo/湯澤/湯澤_2.jpg', 'photo/湯澤/湯澤_3.jpg'] }
     ],
 
     // ---- 音訊設定（BGM / 音效）----
@@ -134,7 +146,7 @@
       // Wendy 的家人（左側）
       { side: 'gf', opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x4a4a4a, cloth: 0x5a7a9a },              lx: -3.2, lz: -0.5, name: 'Wendy 爸爸' },
       { side: 'gf', opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x6b4a32, cloth: 0xff8fab },              lx: -2.0, lz: -1.4, name: 'Wendy 媽媽' },
-      { side: 'gf', opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x8d5524, cloth: 0xa29bfe },              lx: -3.0, lz: 1.0,  name: 'Jacky (姐)' },
+      { side: 'gf', opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x8d5524, cloth: 0xa29bfe },              lx: -3.0, lz: 1.0,  name: 'Jackie (姐)' },
       { side: 'gf', opt: { kind: 'girl',  skin: 0xffe0bd, hair: 0x5b3a29, cloth: 0xffd166, scale: 0.62 }, lx: -1.6, lz: 0.3,  name: 'Summer (姪女)' },
       // 我的家人（右側）—— 求婚前保密，求婚成功才出現
       { side: 'me', opt: { kind: 'man',   skin: 0xeac086, hair: 0x3a3a3a, cloth: 0x4a6fa5 },              lx: 3.2,  lz: -0.5, name: '我 爸爸' },
@@ -145,13 +157,29 @@
       { side: 'me', opt: { kind: 'girl',  skin: 0xf0c59a, hair: 0x4a3020, cloth: 0xa9e6f0, scale: 0.58 }, lx: 2.6,  lz: 1.3,  name: '姪女②' }
     ],
 
-    // ---- 好友島成員（名單後補，先放 5 位佔位）----
+    // ---- 好友島成員（依各時期同學／同事分組；lx/lz 為島上座標，name 為 hover 泡泡文字）----
+    //      想換成真實名字：直接改 name 即可；新增人物就多複製一行。
     friends: [
-      { opt: { kind: 'man',   skin: 0xeac086, hair: 0x2b2016, cloth: 0x4a90d9 }, lx: -2.6, lz: -0.6, name: '好友（待補）' },
-      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x6b4a32, cloth: 0xff8fab }, lx: 0.0,  lz: -1.2, name: '好友（待補）' },
-      { opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x3a2a20, cloth: 0x8ccf8a }, lx: 2.6,  lz: -0.6, name: '好友（待補）' },
-      { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x7a4a28, cloth: 0xffd166 }, lx: 1.2,  lz: 1.0,  name: '好友（待補）' },
-      { opt: { kind: 'man',   skin: 0xeec9a0, hair: 0x15110d, cloth: 0xcdb4db }, lx: -1.2, lz: 1.0,  name: '好友（待補）' }
+      // 國小同學
+      { opt: { kind: 'man',   skin: 0xeac086, hair: 0x2b2016, cloth: 0xf4a261 }, lx: -4.0, lz: -0.6, name: '國小同學' },
+      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x6b4a32, cloth: 0xffb4c8 }, lx: -4.2, lz: 1.0,  name: '國小同學' },
+      { opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x3a2a20, cloth: 0x90be6d }, lx: -3.0, lz: 2.3,  name: '國小同學' },
+      // 國中同學
+      { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x15110d, cloth: 0xa29bfe }, lx: -1.8, lz: 3.2,  name: '國中同學' },
+      { opt: { kind: 'man',   skin: 0xeec9a0, hair: 0x15110d, cloth: 0x4a90d9 }, lx: -0.4, lz: 3.9,  name: '國中同學' },
+      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x8d5524, cloth: 0xffd166 }, lx: 1.0,  lz: 3.3,  name: '國中同學' },
+      // 高中同學
+      { opt: { kind: 'man',   skin: 0xeac086, hair: 0x4a4a4a, cloth: 0x8ccf8a }, lx: 2.4,  lz: 2.6,  name: '高中同學' },
+      { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x7a4a28, cloth: 0xff8fab }, lx: 3.6,  lz: 1.4,  name: '高中同學' },
+      { opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x2b2016, cloth: 0xcdb4db }, lx: 4.2,  lz: -0.2, name: '高中同學' },
+      // 大學同學
+      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x5b3a29, cloth: 0xa9e6f0 }, lx: -2.6, lz: 0.8,  name: '大學同學' },
+      { opt: { kind: 'man',   skin: 0xeac086, hair: 0x3a3a3a, cloth: 0xe76f51 }, lx: -1.0, lz: 1.6,  name: '大學同學' },
+      { opt: { kind: 'woman', skin: 0xf0c59a, hair: 0x6b4a32, cloth: 0x8ccf8a }, lx: 0.6,  lz: 1.0,  name: '大學同學' },
+      // CB 同事
+      { opt: { kind: 'man',   skin: 0xeec9a0, hair: 0x15110d, cloth: 0x4a6fa5 }, lx: 0.0,  lz: -0.4, name: 'CB 同事' },
+      { opt: { kind: 'woman', skin: 0xffe0bd, hair: 0x4a3020, cloth: 0xff9ab0 }, lx: 1.5,  lz: -1.0, name: 'CB 同事' },
+      { opt: { kind: 'man',   skin: 0xf0c59a, hair: 0x3a2a20, cloth: 0xffc8dd }, lx: 2.9,  lz: -0.6, name: 'CB 同事' }
     ],
 
     // ---- 迪士尼島圓耳朵吉祥物小人（原創致敬風格，非特定角色）----
